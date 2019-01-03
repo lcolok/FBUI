@@ -16,11 +16,11 @@ function httpRedirect(config) {
     axios.create({
       // timeout: 1500,
       maxRedirects: 0,
-      inCharset:'UTF-8',
-      outCharset:'UTF-8',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-      },
+    //   inCharset:'UTF-8',
+    //   outCharset:'UTF-8',
+    //   headers: {
+    //     'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+    //   },
       transformRequest: [data => Qs.stringify(data)]
     })(config)
   )
@@ -55,15 +55,13 @@ AV.init({
 
 var ShimoBed = AV.Object.extend('ShimoBed');
 
-var type = "🎬";
-var title = "电信ch直播测试";
-var shortURL = "t.cn/E4Mgz5Q";
 
 var key = "足球";
 
 
 
 void(async()=>{
+
     const [res, error] = await http({
         method: "get",
         url: 'https://shimo.im/smapi/files/K8CWmBMqMtYYpU1f/discussions?limit=99999999',
@@ -73,45 +71,133 @@ void(async()=>{
       }
       console.log("请求成功: " + res);
       
-      getOrig(res);
+      var all='';
+
+      var query = new AV.Query('ShimoBed');
+      query.select('shortURL');
+      query.limit(1000);
+      query.find().then(function (every) {
+
+          console.log("总数:"+every.length);
+          every.forEach(function(each) {
+              all +=  each.attributes.shortURL.split('/').pop()+'\n';
+              
+        });
+
+
+        getOrig(res,all);
+
+      }).then(function(todos) {
+        // 更新成功
+      }, function (error) {
+        // 异常处理
+      });
+
+     
 })();
 
 
-async function getOrig(response){
+async function checkSame(dic,all){
+    var shortURL = dic.shortURL;
+    
+    if(!shortURL.match('t.cn/')){
+        return console.log("不符合短链标准:"+shortURL)
+    }
+    var key = shortURL.split('/').pop();
+
+    if(all.match(key)){
+        console.log('跳过重复上传:'+dic.name)
+    }else{//没检查到有重复
+        await handleDic(dic);
+    }
+
+    // var query = new AV.SearchQuery('ShimoBed');//class名
+    //  query.queryString(key);//要搜索的关键词
+    //  query.find().then(async function(results) {
+    //     if(query.hits()==0){//没检查到有重复
+    //        await handleDic(dic);
+    //     }else{
+    //         console.log('跳过重复上传:'+dic.name)
+    //     }
+
+    //    //处理 results 结果
+    //  }).catch(function(err){
+    //    //处理 err
+    //  });
+}
+
+
+function searchLC(key){
+    var query = new AV.SearchQuery('ShimoBed');//class名
+     query.queryString(key);//要搜索的关键词
+     query.find().then(function(results) {
+       console.log("找到了 " + query.hits() + " 个文件.");
+       console.log(results);
+
+       //处理 results 结果
+     }).catch(function(err){
+       //处理 err
+     });
+}
+
+async function getOrig(response,all){
     var list = response.data.data.list;
+
+
 
     for(var i in list){
         var item = list[i];
         var dic = JSON.parse(item.data.content);
-        //  console.log(dic);
-        var shortURL = dic.shortURL;
-        delete dic.shortURL;
-    
-        shortURL = shortURL.match(/((http|ftp|https):\/\/)?[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:\/~\+#]*[\w\-\@?^=%&amp;\/~\+#])?/gm)[0];
-    
-        if (!shortURL.match('http')) {
-            shortURL = 'https://' + shortURL;
-        }
-    
-        var uploaderURL = await expand(shortURL);
-        // console.log(uploaderURL);
-        var shimoURL = await expand(uploaderURL);
-        // console.log(shimoURL);
-        var longURL = shimoURL.split('?').shift();
-        // console.log(longURL);
-        var fileType = longURL.split('/').pop().split('.').pop();
-        // console.log(fileType);
-    
-        dic.type = fileType;
-        dic.shortURL = shortURL;
-        dic.uploaderURL = uploaderURL;
-        dic.longURL = longURL;
-        console.log(dic);
-        addItem(dic);
+
+        await checkSame(dic,all);
+
     }
 
 }
 
+async function handleDic(dic){
+    var shortURL = dic.shortURL;
+    delete dic.shortURL;
+
+    shortURL = shortURL.match(/((http|ftp|https):\/\/)?[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:\/~\+#]*[\w\-\@?^=%&amp;\/~\+#])?/gm)[0];
+
+    if (!shortURL.match('http')) {
+        shortURL = 'https://' + shortURL;
+    }
+
+    var longURL = await expand(shortURL);
+    // console.log(uploaderURL);
+    if(longURL.match('uploader')){
+        var uploaderURL = longURL;
+        var shimoURL = await expand(longURL);
+        shimoURL = shimoURL.split('?').shift();
+    }else{
+        var shimoURL = undefined;
+    }
+    // console.log(shimoURL);
+    // console.log(longURL);
+    try{
+        var fileType = uploaderURL.split('/').pop().split('.').pop();
+        dic.type = fileType;
+    }catch(e){
+
+    }
+
+    try{
+        var fileType = longURL.split('/').pop().split('.').pop();
+        dic.type = fileType;
+    }catch(e){
+
+    }
+
+    // console.log(fileType);
+
+    dic.shortURL = shortURL;
+    dic.uploaderURL = uploaderURL;
+    dic.longURL = longURL;
+    console.log(dic);
+    addItem(dic);
+}
 
 
 function addItem(dic) {

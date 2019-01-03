@@ -1,0 +1,108 @@
+<style>
+/*
+  App Search Stylesheet
+
+  Changelog:
+  v0.0.1
+  - Initial release
+*/
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-size: 16px;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+img, p, h1, h2, h3, h4, li {
+  line-height: 1.8;
+}
+
+a {
+  color: #3090e3;
+  text-decoration: none;
+}
+
+.wrap {
+  text-align: center;
+}
+  .section {
+    border-bottom: 1px solid #eee;
+    padding: 20px;
+  }
+    .section.section-result {
+      background: #f5f5f5;
+    }
+      .section.section-result p {
+        width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .section.section-result ul {
+        list-style: none;
+      }
+    .section.section-open {
+      color: #fff;
+      background: #3090e3;
+    }
+      .btn {
+        display: inline-block;
+        color: #fff;
+        border: 1px solid #fff;
+        padding: 10px 20px;
+        border-radius: 4px;
+        margin-top: 10px;
+      }
+    .section-inner {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+</style>
+
+<div class="wrap">
+  <div class="section section-open">
+    <div class="section-inner">
+      <p>已安装 {{applinks.app_name}}？您可以:</p>
+      <p><a href='{{app_uri}}' class="btn">直接打开应用</a></p>
+    </div>
+  </div>
+
+  <div class="section section-download">
+    <div class="section-inner">
+      <p>或者下载应用:</p>
+      <div>
+        {{#if applinks.iphone_link}}
+          <p><a href='{{applinks.iphone_link}}'>iPhone 应用</a></p>
+        {{/if}}
+
+        {{#if applinks.ipad_link}}
+          <p><a href='{{applinks.ipad_link}}'>iPad 应用</a></p>
+        {{/if}}
+
+        {{#if applinks.android_phone_link}}
+          <p><a href='{{applinks.android_phone_link}}'>Android 手机应用</a></p>
+        {{/if}}
+
+        {{#if applinks.android_pad_link}}
+          <p><a href='{{applinks.android_pad_link}}'>Android 平板应用</a></p>
+        {{/if}}
+      </div>
+    </div>
+     <div class="section-inner">
+       <p>扫描二维码访问本页面:</p>
+       <div>
+         <img src="{{qrcode_uri}}"/>
+       </div>
+     </div>
+  </div>
+
+  <div class="section section-footer">
+    <div class="section-inner">
+      <p>Powered by <a href="http://leancloud.cn/">LeanCloud</a></p>
+    </div>
+  </div>
+</div>
