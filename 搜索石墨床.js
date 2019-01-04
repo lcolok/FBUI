@@ -8,10 +8,8 @@ AV.init({
     appKey: 'vLplaY3j4OYf3e6e603sb0JX',
 });
 
-var ShimoBed = AV.Object.extend('ShimoBed');
 
-
-var key = "足球";
+var key = "泰国";
 
 
 
@@ -25,17 +23,23 @@ function searchLC(key){
     var query = new AV.SearchQuery('ShimoBed');//class名
      query.queryString(key);//要搜索的关键词
      query.find().then(function(results) {
-       console.log("找到了 " + query.hits() + " 个文件.");
+    //    console.log("找到了 " + query.hits() + " 个文件.");
+       var result = [];
        
        results.forEach(e => {
+        
         var dic = e.attributes;
 
         // var output = `${dic.type} ${dic.name} | ${dic.shortURL}`;
         var output = `${emoji(dic.type)} ${dic.name} | ${cutHTTP(dic.shortURL)}`;
 
-        console.log(output);
+        if (!result.join().match(output)) {//去除重复项目
+            result.push(output);
+        }
+        
        });
-
+       console.log("找到了 " + result.length + " 个文件.");
+       console.log(result);
        //处理 results 结果
      }).catch(function(err){
        //处理 err
@@ -76,5 +80,6 @@ function emoji(suffix) {
 }
 
 function cutHTTP(shortURL){
-   return 't.cn/'+shortURL.split('/').pop();
+    return shortURL;
+//    return 't.cn/'+shortURL.split('/').pop();
 }
