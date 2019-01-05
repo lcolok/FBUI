@@ -75,7 +75,7 @@ void(async()=>{
 
       var query = new AV.Query('ShimoBed');
       query.select('shortURL');
-      query.limit(1000);
+      query.limit(1000);//请求数量上限为1000条
       query.find().then(function (every) {
 
           console.log("总数:"+every.length);
