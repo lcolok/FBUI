@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Android video play</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        input[type=range] {
+            /* -webkit-appearance: none; */
+            width: 500px;
+            border-radius: 10px; /*这个属性设置使填充进度条时的图形为圆角*/
+        }
+
+        /* use the complete page */
+    </style>
+</head>
+
+<body>
+    <p>This is a demo about video play</p>
+    <p><video id="video" controls='true' preload='auto' loop="false" width="200" height="auto" src="https://attachments-cdn.shimo.im/qvjWd3vND70cz88b/贝壳总合成0105_SFX_.mp4"
+            crossorigin=" "></video></p>
+
+    <p><canvas id='canvas1' width='355.555556' height='200'></canvas>
+        <canvas id='canvas2' width='355.555556' height='200'></canvas>
+        <canvas id='canvas3' width='355.555556' height='200'></canvas>
+        <canvas id='canvas4' width='355.555556' height='200'></canvas>
+    </p>
+
+    <p><input id="range" type="range" width='500' min="0" max="1000" value="0" oninput="change()" /></p>
+
+    <script>
+
+        function change() {
+            var value = document.getElementById("range").value;
+            video.currentTime = value / 1000 * video.duration;
+            video.play();
+        }
+
+        function init(number) {
+            var video = document.getElementById("video");
+            var videoImage = document.getElementById("canvas"+number);
+
+ 
+
+            var videoImageContext = videoImage.getContext('2d');
+            videoImageContext.fillStyle = '#FF0000';
+            videoImageContext.fillRect(0, 0, videoImage.width, videoImage.height);
+            
+            //  videoImage.width = video.width;
+            // videoImage.height = video.height;
+
+            videoImageContext.drawImage(video, 0, 0, videoImage.width, videoImage.height);
+            render();
+            function render() {
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    if(video.currentTime<=video.duration/4*number)
+                    videoImageContext.drawImage(video, 0, 0, videoImage.width, videoImage.height);
+                }
+                requestAnimationFrame(render);
+            }
+        }
+        init(1);
+        init(2);
+        init(3);
+        init(4);
+
+       
+            for (var i = 1; i < 4; i++) {
+                video.currentTime = video.duration*i/4;
+                setTimeout(() => {},200)
+            }
+      
+
+
+    </script>
+</body>
+
+</html>
