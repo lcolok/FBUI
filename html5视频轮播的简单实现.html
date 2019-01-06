@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script type="text/javascript">
+        var video = document.getElementById("videoYX");
+        video.addEventListener("ended", function() { // 对视频播放添加结束事件，播放结束后调用videoNext()方法
+            videoNext();
+        }, false);
+        var videoNext = function(){
+            var vid = $('#videoYX').data('vid');
+            $.ajax({
+                url : 'https://attachments-cdn.shimo.im/qvjWd3vND70cz88b/贝壳总合成0105_SFX_.mp4', // 获取下个视频相关信息，如播放地址等
+                data : {
+                    videoId : vid
+                },
+                dataType : 'json',
+                type : 'get',
+                success : function(res) {
+                    var data = res.data;
+                    $('#videoYX').attr('src', data.playUrl);
+                    $('#videoYX').data('vid', data.id);
+                    video.load(); // 加载播放视频
+                    video.play();
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="flowplayer">
+        <video id="videoYX" data-vid="视频id" width="100%" height="100%" poster="图片地址"  src="播放地址" x-webkit-airplay="true" autoplay="autoplay" webkit-playsinline="true"  controls="controls">
+            您的手机不支持html5标签
+        </video>
+    </div>
+</body>
+</html>

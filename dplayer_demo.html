@@ -1,0 +1,23 @@
+<head>
+  <title>Dplayer</title>
+  <meta charset="UTF-8">
+  <!-- Style -->
+  <link rel=stylesheet type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/dplayer/1.22.2/DPlayer.min.css"></link>
+  <!-- Player -->
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/dplayer/1.22.2/DPlayer.min.js"></script>
+</head>
+
+<body>
+  <div id="dplayer"></div>
+  <script>
+    const dp = new DPlayer({
+      container: document.getElementById('dplayer'),
+      video: {
+        url: 'https://attachments-cdn.shimo.im/qvjWd3vND70cz88b/贝壳总合成0105_SFX_.mp4',
+        type: 'auto',
+        thumbnails:'montage.jpg'
+      },
+
+    });
+  </script>
+</body>

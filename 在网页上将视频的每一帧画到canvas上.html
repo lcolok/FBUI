@@ -55,13 +55,25 @@
             // videoImage.height = video.height;
 
             videoImageContext.drawImage(video, 0, 0, videoImage.width, videoImage.height);
-            render();
+            // render();
+            render1Frame();
             function render() {
                 if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                  
                     if(video.currentTime<=video.duration/4*number)
                     videoImageContext.drawImage(video, 0, 0, videoImage.width, videoImage.height);
                 }
                 requestAnimationFrame(render);
+            }
+
+            function render1Frame() {
+                for(var i=0;i<4;i++){
+                    if(video.currentTime<=video.duration/4*i){
+                        videoImageContext.drawImage(video, 0, 0, videoImage.width, videoImage.height);
+                    }
+                }
+                requestAnimationFrame(render1Frame);
+               
             }
         }
         init(1);
@@ -70,11 +82,7 @@
         init(4);
 
        
-            for (var i = 1; i < 4; i++) {
-                video.currentTime = video.duration*i/4;
-                setTimeout(() => {},200)
-            }
-      
+    
 
 
     </script>
