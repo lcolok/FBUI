@@ -9,25 +9,28 @@ AV.init({
 });
 
 
-var key = "泰国";
+var key = "RAP";
 
 
 
-void(async()=>{
-    searchLC(key);
+void (async () => {
+    var result = await searchLC(key);
+    console.log("找到了 " + result.length + " 个文件.");
+    console.log(result);
 })();
 
 
 
-function searchLC(key){
+async function searchLC(key) {
     var query = new AV.SearchQuery('ShimoBed');//class名
-     query.queryString(key);//要搜索的关键词
-     query.find().then(function(results) {
+    query.queryString(key);//要搜索的关键词
+    var resp = await query.find();
+
     //    console.log("找到了 " + query.hits() + " 个文件.");
-       var result = [];
-       
-       results.forEach(e => {
-        
+    var result = [];
+
+    resp.forEach(e => {
+
         var dic = e.attributes;
 
         // var output = `${dic.type} ${dic.name} | ${dic.shortURL}`;
@@ -36,14 +39,10 @@ function searchLC(key){
         if (!result.join().match(output)) {//去除重复项目
             result.push(output);
         }
-        
-       });
-       console.log("找到了 " + result.length + " 个文件.");
-       console.log(result);
-       //处理 results 结果
-     }).catch(function(err){
-       //处理 err
-     });
+
+    });
+
+    return result;
 }
 
 
@@ -79,7 +78,7 @@ function emoji(suffix) {
     return emoji;
 }
 
-function cutHTTP(shortURL){
+function cutHTTP(shortURL) {
     return shortURL;
-//    return 't.cn/'+shortURL.split('/').pop();
+    //    return 't.cn/'+shortURL.split('/').pop();
 }
