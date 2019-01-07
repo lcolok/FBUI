@@ -3,6 +3,12 @@ var AV = require('leancloud-storage');
 var axios = require('axios');
 const Qs = require("qs");
 
+// 初始化存储 SDK
+AV.init({
+  appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
+  appKey: 'vLplaY3j4OYf3e6e603sb0JX',
+});
+
 async function tryCatch(promise) {
   try {
     const ret = await promise
@@ -36,55 +42,7 @@ var genericHeaders = {//一定要填充这个请求头才能规避那个频次�
 };
 
 
-async function update(newDiscussionID, getAttachmentID) {//更新上传专用的石墨文档的项目是否与评论区同步
-  var joinList, realName, name, attachment, attachmentsList, content;
-  var sumSize = 0;
-  var count = 0;
-  var list = await getDiscussion(newDiscussionID);//post评论区的文档
-  var total = list.length;
 
-  attachmentsList = await getAttachment(getAttachmentID);//get附件的文档
-  if (list.length != 0) {//检测评论区目标是否一条评论都没有
-    joinList = list.join("\n");
-  } else {
-    joinList = "";
-  }
-
-  for (var j in list) {
-    if ((list[j]).match("size")) {
-      sumSize += Number(JSON.parse(list[j]).size);
-    }
-  }
-
-  for (var i in attachmentsList) {
-
-
-
-    attachment = attachmentsList[i];
-    realName = attachment.name;
-    name = realName.split(".");
-    name.pop();
-    name = name.join(".");//去掉后缀
-
-
-    var name_trans = googleTranslateByPost(name.toLowerCase());
-    var shortURL = shortenURL(input);
-    content = JSON.stringify({ type: type, name: name, shortURL: shortURL, name_trans: name_trans, size: size });
-    postDiscussion(newDiscussionID, content)
-
-
-
-    //name = name.replace(/"/gm,/\"/);//斜杠问题的修正
-
-  }
-
-  if (count != 0) {
-    console.log("共增加" + count + "个新项目" + "，已上传 " + (total + count) + " 个文件，累计 " + KB2GB(sumSize) + " GB");
-  } else {
-    console.log("已上传 " + total + " 个文件，累计 " + KB2GB(sumSize) + " GB");
-  }
-  //newRevert(getAttachmentID,dataHistoryID);//更新完成后，马上清空「上传专用」文档，清零作用
-}
 
 function KB2GB(KB) {
   return (KB / (1024 * 1024 * 1024)).toFixed(2);
@@ -169,7 +127,8 @@ async function getAttachment(fileID) {
 async function postDiscussion(fileID, content) {
   var list = await getDiscussion(fileID);
   joinList = list.join("\n");
-  if (joinList.match(content)) {//查重检测
+  var contentJSON = JSON.parse(content);
+  if (joinList.match(contentJSON.uploaderURL)) {//查重检测
     return "same";
   }
 
@@ -186,9 +145,6 @@ async function postDiscussion(fileID, content) {
   if (error) {
     return console.log("Discussion请求出错: " + err);
   }
-  console.log("Discussion请求成功: " + resp);
-
-
 
   resp = JSON.parse(resp);
   if (resp.code !== 0) {
@@ -215,16 +171,101 @@ async function shortenURL(input) {
     var input = input.replace(longURL[i], shortURL);
   }
   var clearHTTP = await cutHTTP(input);
-  console.log(clearHTTP);
+  // console.log(clearHTTP);
   return clearHTTP;
 }
 
-function cutHTTP(input){
-  return input.replace(/[a-zA-z]+:\/\//g, ' ');
+function cutHTTP(input) {
+  return input.replace(/[a-zA-z]+:\/\//g, '');
 }
 
+async function googleTranslateByPost(orig) {
+
+  var sl = 'auto';
+  var tl = 'zh-CN';
+try{
+  var response = await axios({
+    method: 'POST',
+    url: "http://translate.google.cn/translate_a/single",
+    params: { "dt": "t", "q": orig, "tl": tl, "ie": "UTF-8", "sl": sl, "client": "ia", "dj": "1" }
+  });
+
+  var i;
+  var output = '';
+  var trans = response.data.sentences;
+  if (trans.length > 1) {
+    for (i = 0; i < trans.length; ++i) {
+      output += trans[i]['trans'] + '\n';
+    }
+  }
+  else {
+    output = trans[0]['trans'];
+  }
+  console.log(output);
+  return output;
+}catch(e){
+  return "none";
+}
+
+}
+
+
+async function update(newDiscussionID, getAttachmentID) {//更新上传专用的石墨文档的项目是否与评论区同步
+  var joinList, realName, name, attachment, attachmentsList, content;
+  var sumSize = 0;
+  var count = 0;
+  var list = await getDiscussion(newDiscussionID);//post评论区的文档
+  var total = list.length;
+
+  attachmentsList = await getAttachment(getAttachmentID);//get附件的文档
+  if (list.length != 0) {//检测评论区目标是否一条评论都没有
+    joinList = list.join("\n");
+  } else {
+    joinList = "";
+  }
+
+  for (var j in list) {
+    if ((list[j]).match("size")) {
+      sumSize += Number(JSON.parse(list[j]).size);
+    }
+  }
+
+  for (var i in attachmentsList) {
+
+    var attachment = attachmentsList[i];
+    var realName = attachment.name.split(".");
+    var name = realName[0];
+
+    content = JSON.stringify({
+      type: realName[1],
+      name: name,
+      shortURL: await shortenURL(attachment.url),
+      name_trans: await googleTranslateByPost(name.toLowerCase()),
+      size: attachment.size,
+      uploaderURL: attachment.url
+    });
+
+    console.log(content);
+    postDiscussion(newDiscussionID, content);
+
+
+
+    //name = name.replace(/"/gm,/\"/);//斜杠问题的修正
+
+  }
+
+  if (count != 0) {
+    console.log("共增加" + count + "个新项目" + "，已上传 " + (total + count) + " 个文件，累计 " + KB2GB(sumSize) + " GB");
+  } else {
+    console.log("已上传 " + total + " 个文件，累计 " + KB2GB(sumSize) + " GB");
+  }
+  //newRevert(getAttachmentID,dataHistoryID);//更新完成后，马上清空「上传专用」文档，清零作用
+}
+
+
 void (async () => {
-  // update(newDiscussionID,getAttachmentID);
+  // googleTranslateByPost("hello");
+  update(newDiscussionID, getAttachmentID);
   // postDiscussion(newDiscussionID, "123213213213");
-  shortenURL("https://www.kancloud.cn/yunye/axios/234845");
+  // shortenURL("https://www.kancloud.cn/yunye/axios/234845");
 })();

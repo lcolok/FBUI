@@ -101,12 +101,14 @@ async function checkSame(dic,all){
     var shortURL = dic.shortURL;
     
     if(!shortURL.match('t.cn/')){
-        return console.log("不符合短链标准:"+shortURL)
+        // console.log("不符合短链标准:"+shortURL);
+        return
     }
     var key = shortURL.split('/').pop();
 
     if(all.match(key)){
-        console.log('跳过重复上传:'+dic.name)
+        // console.log('跳过重复上传:'+dic.name);
+        return 
     }else{//没检查到有重复
         await handleDic(dic);
     }
