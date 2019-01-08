@@ -9,7 +9,7 @@ AV.init({
 });
 
 
-var key = "成都";
+var key = "SVIP";
 
 
 

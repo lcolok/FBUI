@@ -5,6 +5,16 @@ const Qs = require("qs");
 
 
 
+var key = "成都";
+
+// 初始化存储 SDK
+AV.init({
+  appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
+  appKey: 'vLplaY3j4OYf3e6e603sb0JX',
+});
+
+var ShimoBed = AV.Object.extend('ShimoBed');
+
 async function tryCatch(promise) {
   try {
     const ret = await promise
@@ -60,13 +70,13 @@ async function getDiscussion(fileID) {
 
   const [resp, error] = await http({
     method: "get",
-    url: 'https://shimo.im/smapi/files/K8CWmBMqMtYYpU1f/discussions?limit=99999999',
+    url: `https://shimo.im/smapi/files/${fileID}/discussions?limit=99999999`,
     headers: headers,
   })
   if (error) {
     return console.log("getDiscussion请求出错: " + err);
   }
-  console.log("getDiscussion请求成功");
+  // console.log("getDiscussion请求成功");
 
   var list = resp.data.data.list;
 
@@ -97,7 +107,7 @@ async function getAttachment(fileID) {
   if (error) {
     return console.log("getAttachment请求出错: " + err);
   }
-  console.log("getAttachment请求成功 ");
+  // console.log("getAttachment请求成功 ");
 
 
 
@@ -114,7 +124,7 @@ async function getAttachment(fileID) {
     }
   }
 
-  console.log(attachmentsList);
+  // console.log(attachmentsList);
 
   return attachmentsList;
 }
@@ -240,13 +250,6 @@ function emoji(suffix) {
 }
 
 function addItem(dic) {
-  // 初始化存储 SDK
-  AV.init({
-    appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
-    appKey: 'vLplaY3j4OYf3e6e603sb0JX',
-  });
-
-  var ShimoBed = AV.Object.extend('ShimoBed');
 
   var file = new ShimoBed();
 
@@ -328,17 +331,115 @@ async function update(newDiscussionID, getAttachmentID) {//更新上传专用的
   var count = result.length;
   if (count != 0) {
     console.log("共增加" + count + "个新项目" + "，已上传 " + (total + count) + " 个文件，累计 " + KB2GB(sumSize) + " GB");
+    console.log('\n' + result.join('\n') + '\n');
   } else {
     console.log("已上传 " + total + " 个文件，累计 " + KB2GB(sumSize) + " GB");
   }
-  console.log(result.join('\n'));
+
   //newRevert(getAttachmentID,dataHistoryID);//更新完成后，马上清空「上传专用」文档，清零作用
 }
 
+async function searchLC(key) {
+  var query = new AV.SearchQuery('ShimoBed');//class名
+  query.queryString(key);//要搜索的关键词
+  var resp = await query.find();
+
+  //    console.log("找到了 " + query.hits() + " 个文件.");
+  var result = [];
+
+  resp.forEach(e => {
+
+    var dic = e.attributes;
+
+    // var output = `${dic.type} ${dic.name} | ${dic.shortURL}`;
+    var output = `${emoji(dic.type)} ${dic.name} | ${cutHTTP(dic.shortURL)}`;
+
+    if (!result.join().match(output)) {//去除重复项目
+      result.push(output);
+    }
+
+  });
+
+  return result;
+}
+
+
+async function download(url) {
+  var resp = await axios({
+    method: 'get',
+    url: url,
+    onDownloadProgress: function (progressEvent) {
+      console.log(progressEvent);
+      // 对原生进度事件的处理
+    },
+  })
+  return resp;
+}
+
+async function upload(blob) {
+
+  var formData = {
+    server: 'qiniu',
+    type: 'attachments',
+    accessToken: await getToken(),
+    file: blob
+  };
+  var resp = await axios({
+    url: 'https://uploader.shimo.im/upload2',
+    method: "POST",
+    headers: {
+      "Accept": "application/json",
+      "Accept-Encoding": "br, gzip, deflate",
+      "Accept-Language": "zh-cn",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
+      "Content-Type": "multipart/form-data;",
+      "Origin": "https://shimo.im",
+      "Referer": "https://shimo.im/docs/nCDwJ8FpCjUfwCAk",
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1.1 Safari/605.1.15",
+      "X-Requested-With": "XMLHttpRequest",
+    },
+    data: formData
+  });
+  console.log(resp.data);
+}
+
+async function getTokenRaw() {
+  var options = {
+    url: 'https://shimo.im/api/upload/token',
+    method: 'post',
+    headers: {
+      Cookie: shimoCookie
+    }
+  }
+  var resp = await axios(options);
+  var token = resp.data.data.accessToken;
+  console.log(token);
+  return token;
+}
+
+async function getToken() {
+  var resp = await getDiscussion('BIqrOzKiVEoPs8ke');
+  return resp[0];
+}
 
 void (async () => {
+  // update(newDiscussionID, getAttachmentID);
+  // var result = await searchLC(key);
+  // console.log("找到了 " + result.length + " 个文件.");
+  // console.log('\n'+result.join('\n')+'\n');
+
+  // download("http://t.cn/EG81H9v");
+
+  // var token = await getTokenRaw();
+
+
+  var url = 'https://cdn.dribbble.com/users/61921/screenshots/3675278/colourful-boxes.png';
+  var blob = await download(url);
+
+  await upload(blob);
+
   // googleTranslateByPost("hello");
-  update(newDiscussionID, getAttachmentID);
   // postDiscussion(newDiscussionID, "123213213213");
   // shortenURL("https://www.kancloud.cn/yunye/axios/234845");
 })();
