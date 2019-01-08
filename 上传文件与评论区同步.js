@@ -3,11 +3,7 @@ var AV = require('leancloud-storage');
 var axios = require('axios');
 const Qs = require("qs");
 
-// 初始化存储 SDK
-AV.init({
-  appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
-  appKey: 'vLplaY3j4OYf3e6e603sb0JX',
-});
+
 
 async function tryCatch(promise) {
   try {
@@ -125,12 +121,7 @@ async function getAttachment(fileID) {
 
 
 async function postDiscussion(fileID, content) {
-  var list = await getDiscussion(fileID);
-  joinList = list.join("\n");
-  var contentJSON = JSON.parse(content);
-  if (joinList.match(contentJSON.uploaderURL)) {//查重检测
-    return "same";
-  }
+
 
   const [resp, error] = await http({
     method: "post",
@@ -169,9 +160,8 @@ async function shortenURL(input) {
     var shortURL = json['urls'][0]["url_short"];
     var input = input.replace(longURL[i], shortURL);
   }
-  var clearHTTP = await cutHTTP(input);
   // console.log(clearHTTP);
-  return clearHTTP;
+  return input;
 }
 
 function cutHTTP(input) {
@@ -209,7 +199,7 @@ async function googleTranslateByPost(orig) {
     else {
       output = trans[0]['trans'];
     }
-    console.log("谷歌翻译成功结果："+output);
+    console.log("谷歌翻译成功结果：" + output);
     return output;
   } catch (e) {
     console.log("谷歌翻译失败");
@@ -218,13 +208,72 @@ async function googleTranslateByPost(orig) {
 
 }
 
+function emoji(suffix) {
+  var emoji;
+
+  if (suffix.match(/[a-zA-Z]/g)) {
+    if (suffix.match(/mp4|mov|avi/ig)) {//根据后缀给出emoji
+      emoji = "🎬";//常规视频文件
+    } else if (suffix.match(/webm|mkv|avi/ig)) {
+      emoji = "▶️";//手机无法播放的非常规视频文件
+    } else if (suffix.match(/mp3|ogg|wav|flac|ape|alca|aac/ig)) {
+      emoji = "🎵";//音频文件
+    } else if (suffix.match(/zip|7z|rar/ig)) {
+      emoji = "📦";//压缩包
+    } else if (suffix.match(/dmg|iso/ig)) {
+      emoji = "💽";//光盘映像
+    } else if (suffix.match(/ai|psd|aep/ig)) {
+      emoji = "📐";//工程文件
+    } else if (suffix.match(/ppt|pptx|key/ig)) {
+      emoji = "📽️";//演示文件
+    } else if (suffix.match(/ttf|otf/ig)) {
+      emoji = "🔤️";//字体文件
+    } else if (suffix.match(/doc|pdf/ig)) {
+      emoji = "️📄";//文档
+    } else {
+      emoji = "❓";//未知格式
+    }
+  } else {
+    emoji = suffix;
+  }
+  return emoji;
+}
+
+function addItem(dic) {
+  // 初始化存储 SDK
+  AV.init({
+    appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
+    appKey: 'vLplaY3j4OYf3e6e603sb0JX',
+  });
+
+  var ShimoBed = AV.Object.extend('ShimoBed');
+
+  var file = new ShimoBed();
+
+  file.set('type', dic.type);
+  file.set('name', dic.name);
+  file.set('name_trans', dic.name_trans);
+  file.set('size', dic.size);
+  file.set('shortURL', dic.shortURL);
+  file.set('uploaderURL', dic.uploaderURL);
+  file.set('longURL', dic.longURL);
+  // file.set('owner', AV.User.current());
+  file.save().then(function () {
+    console.log("已上传到LeanCloud");
+  }, function (error) {
+    console.log(JSON.stringify(error));
+  });
+};
+
 
 async function update(newDiscussionID, getAttachmentID) {//更新上传专用的石墨文档的项目是否与评论区同步
-  var joinList, realName, name, attachment, attachmentsList, content;
+  var joinList, realName, name, attachment, attachmentsList, content, dic;
+  var result = [];
   var sumSize = 0;
   var count = 0;
   var list = await getDiscussion(newDiscussionID);//post评论区的文档
   var total = list.length;
+
 
   attachmentsList = await getAttachment(getAttachmentID);//get附件的文档
   if (list.length != 0) {//检测评论区目标是否一条评论都没有
@@ -245,29 +294,44 @@ async function update(newDiscussionID, getAttachmentID) {//更新上传专用的
     var realName = attachment.name.split(".");
     var name = realName[0];
 
-    content = JSON.stringify({
+
+    if (joinList.match(attachment.url)) {//查重检测
+      // console.log("跳过重复文件:"+attachment.name);
+      continue;
+    }
+
+    var shortURL = await shortenURL(attachment.url);
+
+    dic = {
       type: realName[1],
       name: name,
-      shortURL: await shortenURL(attachment.url),
+      shortURL: shortURL,
       name_trans: await googleTranslateByPost(name.toLowerCase()),
       size: attachment.size,
       uploaderURL: attachment.url
-    });
+    };
 
-    console.log(content);
-    postDiscussion(newDiscussionID, content);
-
+    content = JSON.stringify(dic);
 
 
-    //name = name.replace(/"/gm,/\"/);//斜杠问题的修正
+    postDiscussion(newDiscussionID, content);//上传到评论区
 
+    addItem(dic);//上传到leancloud的数据储存
+
+    var output = `${emoji(dic.type)} ${dic.name} | ${cutHTTP(shortURL)}`;//输出到控制台
+
+
+
+    result.push(output);
   }
 
+  var count = result.length;
   if (count != 0) {
     console.log("共增加" + count + "个新项目" + "，已上传 " + (total + count) + " 个文件，累计 " + KB2GB(sumSize) + " GB");
   } else {
     console.log("已上传 " + total + " 个文件，累计 " + KB2GB(sumSize) + " GB");
   }
+  console.log(result.join('\n'));
   //newRevert(getAttachmentID,dataHistoryID);//更新完成后，马上清空「上传专用」文档，清零作用
 }
 
