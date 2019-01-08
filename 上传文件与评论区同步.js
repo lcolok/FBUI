@@ -60,28 +60,28 @@ async function update(newDiscussionID,getAttachmentID){//更新上传专用的�
     }
   }
   
-  for(var i in attachmentsList){
-    attachment = attachmentsList[i];
-    realName = attachment.name;
-    name = realName.split(".");
-    name.pop();
-    name = name.join(".");//去掉后缀
+  // for(var i in attachmentsList){
+  //   attachment = attachmentsList[i];
+  //   realName = attachment.name;
+  //   name = realName.split(".");
+  //   name.pop();
+  //   name = name.join(".");//去掉后缀
     
-    //name = name.replace(/"/gm,/\"/);//斜杠问题的修正
+  //   //name = name.replace(/"/gm,/\"/);//斜杠问题的修正
    
-      saveLink2Sheet(attachment.url,attachment.size,realName,newDiscussionID);//saveLink2Sheet里面已经包含了postDiscussion的操作
-      sumSize += attachment.size;
-      count++;
-    
-  }
+  // }
+
   if(count!=0){
-    t2m("共增加"+count+"个新项目"+"，已上传 "+(total+count)+" 个文件，累计 "+KB2GB(sumSize)+" GB");
+    console.log("共增加"+count+"个新项目"+"，已上传 "+(total+count)+" 个文件，累计 "+KB2GB(sumSize)+" GB");
   }else{
-    t2m("已上传 "+total+" 个文件，累计 "+KB2GB(sumSize)+" GB");
+    console.log("已上传 "+total+" 个文件，累计 "+KB2GB(sumSize)+" GB");
   }
   //newRevert(getAttachmentID,dataHistoryID);//更新完成后，马上清空「上传专用」文档，清零作用
 }
 
+function KB2GB(KB){
+  return (KB/(1024*1024*1024)).toFixed(2);
+}
 
 async function getDiscussion(fileID){
     var content,list;
@@ -116,7 +116,7 @@ async function getDiscussion(fileID){
       // console.log(contentList);
 
     //contentList.reverse();//顺序倒过来，正常来说最新的内容在最上面
-    //t2m(contentList.join("\n"));
+    //console.log(contentList.join("\n"));
     return contentList;
   }
 
@@ -124,7 +124,7 @@ async function getDiscussion(fileID){
     //var origUrl = "https://api.shimo.im/files/" + fileID + "?contentUrl=true";
     //var origResp = UrlFetchApp.fetch(origUrl);
     //var contentUrl = JSON.parse(origResp).contentUrl;
-    //t2m(contentUrl);
+    //console.log(contentUrl);
     
     
     var url = "https://api.shimo.im/files/" + fileID + "?content=true";
@@ -136,13 +136,13 @@ async function getDiscussion(fileID){
       if (error) {
         return console.log("Attachment请求出错: " + err);
       }
-      console.log("Attachment请求成功: " );
+      console.log("Attachment请求成功 " );
+     
      
 
     var attachmentsList = [];
     var orig = resp.data.content;
     orig = JSON.parse(orig);
-
 
     for (var i = 0; i < orig.length; i++) {
       var attachment = orig[i][1].attachment;
@@ -158,3 +158,34 @@ async function getDiscussion(fileID){
     return attachmentsList;
   }
   
+
+  async function postDiscussion(fileID,content){
+    var list = getDiscussion(fileID);
+    joinList = list.join("\n");
+    
+    if(matchFix(joinList).match(matchFix(content))){
+      return "same";
+    }else{
+      
+      
+      var headers = {
+        "Cookie": shimoCookie,
+      }
+      var options = {
+        "method": "post",
+        "headers":headers,
+        "payload":{
+          'content':content
+        },
+      }
+      var resp = UrlFetchApp.fetch("https://shimo.im/smapi/files/"+fileID+"/discussions",options);
+      resp = JSON.parse(resp);
+      if(resp.code!==0){
+        console.log('讨论上传失败，错误信息：『'+resp.message+'』\n'+"详情请查看："+"https://shimo.im/docs/"+fileID);
+        return "error";
+      }else{
+        return "success"
+      }
+      
+    }
+  }
