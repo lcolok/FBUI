@@ -2,7 +2,7 @@
 var AV = require('leancloud-storage');
 var axios = require('axios');
 const Qs = require("qs");
-
+var request = require('request');
 
 
 var key = "成都";
@@ -379,12 +379,12 @@ async function download(url) {
 async function upload(blob) {
 
   var formData = {
-    server: 'qiniu',
-    type: 'attachments',
-    accessToken: await getToken(),
-    file: blob
+    'server': 'qiniu',
+    'type': 'attachments',
+    'accessToken': await getToken(),
+    'file': blob
   };
-  var resp = await axios({
+  axios({
     url: 'https://uploader.shimo.im/upload2',
     method: "POST",
     headers: {
@@ -393,15 +393,19 @@ async function upload(blob) {
       "Accept-Language": "zh-cn",
       "Cache-Control": "no-cache",
       "Connection": "keep-alive",
-      "Content-Type": "multipart/form-data;",
+      "Content-Type": "multipart/form-data",
       "Origin": "https://shimo.im",
       "Referer": "https://shimo.im/docs/nCDwJ8FpCjUfwCAk",
       "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1.1 Safari/605.1.15",
       "X-Requested-With": "XMLHttpRequest",
     },
-    data: formData
+    data: Qs.stringify(formData)
+  }).then(res=>{
+    console.log(res.response.data);
+  }).catch(err=>{
+    console.log(err.response.data);
   });
-  console.log(resp.data);
+  
 }
 
 async function getTokenRaw() {
@@ -423,15 +427,24 @@ async function getToken() {
   return resp[0];
 }
 
+
+async function shimoSync(){
+  update(newDiscussionID, getAttachmentID);
+  var result = await searchLC(key);
+  console.log("找到了 " + result.length + " 个文件.");
+  console.log('\n'+result.join('\n')+'\n');
+}
+
 void (async () => {
-  // update(newDiscussionID, getAttachmentID);
-  // var result = await searchLC(key);
-  // console.log("找到了 " + result.length + " 个文件.");
-  // console.log('\n'+result.join('\n')+'\n');
+
+  // await shimoSync();
 
   // download("http://t.cn/EG81H9v");
 
   // var token = await getTokenRaw();
+
+
+
 
 
   var url = 'https://cdn.dribbble.com/users/61921/screenshots/3675278/colourful-boxes.png';
