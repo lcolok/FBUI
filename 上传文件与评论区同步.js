@@ -2,7 +2,9 @@
 var AV = require('leancloud-storage');
 var axios = require('axios');
 const Qs = require("qs");
+var fs = require('fs');
 var request = require('request');
+var FormData = require('form-data');
 
 
 var key = "成都";
@@ -376,13 +378,24 @@ async function download(url) {
   return resp;
 }
 
-async function upload(blob) {
+async function upload() {
+
+  var file = fs.createReadStream('demo.jpg');
+  // console.log(file);
+  var token = await getToken();
+  // console.log(token);
+
+  var form = new FormData();
+  form.append('server', 'qiniu');
+  form.append('type', 'attachments');
+  form.append('accessToken', token);
+  form.append('file', file);
 
   var formData = {
     'server': 'qiniu',
     'type': 'attachments',
     'accessToken': await getToken(),
-    'file': blob
+    'file': form
   };
   axios({
     url: 'https://uploader.shimo.im/upload2',
@@ -399,13 +412,13 @@ async function upload(blob) {
       "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1.1 Safari/605.1.15",
       "X-Requested-With": "XMLHttpRequest",
     },
-    data: Qs.stringify(formData)
-  }).then(res=>{
+    data: Qs.stringify(form)
+  }).then(res => {
     console.log(res.response.data);
-  }).catch(err=>{
+  }).catch(err => {
     console.log(err.response.data);
   });
-  
+
 }
 
 async function getTokenRaw() {
@@ -428,11 +441,11 @@ async function getToken() {
 }
 
 
-async function shimoSync(){
+async function shimoSync() {
   update(newDiscussionID, getAttachmentID);
   var result = await searchLC(key);
   console.log("找到了 " + result.length + " 个文件.");
-  console.log('\n'+result.join('\n')+'\n');
+  console.log('\n' + result.join('\n') + '\n');
 }
 
 void (async () => {
@@ -447,10 +460,10 @@ void (async () => {
 
 
 
-  var url = 'https://cdn.dribbble.com/users/61921/screenshots/3675278/colourful-boxes.png';
-  var blob = await download(url);
+  // var url = 'https://cdn.dribbble.com/users/61921/screenshots/3675278/colourful-boxes.png';
+  // var blob = await download(url);
 
-  await upload(blob);
+  await upload();
 
   // googleTranslateByPost("hello");
   // postDiscussion(newDiscussionID, "123213213213");
