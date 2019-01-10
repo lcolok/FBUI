@@ -82,3 +82,7 @@ function cutHTTP(shortURL) {
     return shortURL;
     //    return 't.cn/'+shortURL.split('/').pop();
 }
+
+module.exports={
+    search:searchLC
+}

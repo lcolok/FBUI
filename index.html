@@ -45,9 +45,10 @@
           <input class="new-todo"
             v-if="user"
             autofocus autocomplete="off"
-            placeholder="准备要做些什么？"
+            placeholder="请输入搜索关键词"
             v-model="newTodo"
-            @keyup.enter="addTodo"><!-- 按下回车后执行动作 -->
+            @keyup.enter="searchShimo"><!--@keyup.enter="addTodo" 按下回车后执行动作 -->
+
         </header>
         <section class="main" v-show="todos.length">
           <input class="toggle-all" type="checkbox" v-model="allDone">
@@ -97,5 +98,6 @@
     <script src="https://unpkg.com/leancloud-storage@^3.0.0-beta.3/dist/av-live-query-min.js"></script>
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
     <script src="app.js"></script>
+    <script src="searchShimo.js"></script>
   </body>
 </html>
