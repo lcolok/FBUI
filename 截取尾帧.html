@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Android video play</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        input[type=range] {
+            /* -webkit-appearance: none; */
+            width: 1800px;
+            border-radius: 10px; /*这个属性设置使填充进度条时的图形为圆角*/
+        }
+
+        /* use the complete page */
+    </style>
+</head>
+
+<body>
+    <p>把视频的链接输入以下的文本框中，按提交则能得到最后一帧，右键保存:</p>
+    <p><input type="text" id="url" /><input type="submit" value="Submit" /></p>
+    <p>拖动下方进度条</p>
+    <p><input id="range" type="range" width='500' min="0" max="100000" value="500" oninput="change()" /></p>
+
+    <p><canvas id='canvas' width='750' height='1448'></canvas>
+
+    </p>
+
+    <p><video id="video" controls='true' preload='auto' loop="false" width="200" height="auto" 
+            crossorigin=" "></video></p>
+
+
+
+    <script>
+
+        function change() {
+            var value = document.getElementById("range").value;
+            video.currentTime = value / 100000 * video.duration;
+           
+        }
+
+        function init() {
+            var video = document.getElementById("video");
+            var videoImage = document.getElementById("canvas");
+
+
+
+            var videoImageContext = videoImage.getContext('2d');
+            videoImageContext.fillStyle = '#FF0000';
+            videoImageContext.fillRect(0, 0, videoImage.width, videoImage.height);
+
+            //  videoImage.width = video.width;
+            // videoImage.height = video.height;
+
+            videoImageContext.drawImage(video, 0, 0, videoImage.width, videoImage.height);
+            // render();
+            render1Frame();
+            function render() {
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    videoImageContext.drawImage(video, 0, 0, videoImage.width, videoImage.height);
+                }
+                requestAnimationFrame(render);
+            }
+
+            function render1Frame() {
+
+                videoImageContext.drawImage(video, 0, 0, videoImage.width, videoImage.height);
+
+
+                requestAnimationFrame(render1Frame);
+
+            }
+            video.currentTime = video.duration;
+            
+            document.getElementById("video").innerHTML = makeHTML(list,key);
+        }
+        init();
+
+
+
+
+
+    </script>
+</body>
+
+</html>
