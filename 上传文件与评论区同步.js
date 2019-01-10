@@ -7,7 +7,7 @@ var request = require('request');
 var FormData = require('form-data');
 
 
-var key = "成都";
+var key = "";
 
 // 初始化存储 SDK
 AV.init({
@@ -342,6 +342,7 @@ async function update(newDiscussionID, getAttachmentID) {//更新上传专用的
 }
 
 async function searchLC(key) {
+
   var query = new AV.SearchQuery('ShimoBed');//class名
   query.queryString(key);//要搜索的关键词
   var resp = await query.find();
@@ -443,6 +444,7 @@ async function getToken() {
 
 async function shimoSync() {
   update(newDiscussionID, getAttachmentID);
+  if(!key){return};
   var result = await searchLC(key);
   console.log("找到了 " + result.length + " 个文件.");
   console.log('\n' + result.join('\n') + '\n');
@@ -450,7 +452,7 @@ async function shimoSync() {
 
 void (async () => {
 
-  // await shimoSync();
+  await shimoSync();
 
   // download("http://t.cn/EG81H9v");
 
@@ -463,7 +465,7 @@ void (async () => {
   // var url = 'https://cdn.dribbble.com/users/61921/screenshots/3675278/colourful-boxes.png';
   // var blob = await download(url);
 
-  await upload();
+  // await upload();
 
   // googleTranslateByPost("hello");
   // postDiscussion(newDiscussionID, "123213213213");
