@@ -110,7 +110,7 @@ var app = new Vue({
 
   filters: {
     pluralize: function (n) {
-      return n === 1 ? 'item' : 'items'
+      return n === 1 ? '个项目' : '个项目'
     }
   },
 
@@ -138,6 +138,8 @@ var app = new Vue({
     },
     
     signup: function() {
+      alert("暂时不开放注册。")
+      return
       AV.User.signUp(this.username, this.password).then(function(user) {
         this.user = user.toJSON()
         this.username = this.password = ''

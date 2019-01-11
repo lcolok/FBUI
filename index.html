@@ -3,7 +3,7 @@
 <html data-framework="vue">
   <head>
     <meta charset="utf-8">
-    <title>LeanTodo • Vue.js</title>
+    <title>石墨床</title>
     <link rel="stylesheet" href="fbui.css">
     <style>
       [v-cloak] { display: none; }
@@ -45,9 +45,9 @@
           <input class="new-todo"
             v-if="user"
             autofocus autocomplete="off"
-            placeholder="What needs to be done?"
+            placeholder="准备要做些什么？"
             v-model="newTodo"
-            @keyup.enter="addTodo">
+            @keyup.enter="addTodo"><!-- 按下回车后执行动作 -->
         </header>
         <section class="main" v-show="todos.length">
           <input class="toggle-all" type="checkbox" v-model="allDone">
@@ -72,25 +72,25 @@
         </section>
         <footer class="footer" v-show="todos.length" v-cloak>
           <span class="todo-count">
-            <strong>{{ remaining }}</strong> {{ remaining | pluralize }} left
+            共 <strong>{{ remaining }}</strong> {{ remaining | pluralize }} 
           </span>
           <ul class="filters">
-            <li><a href="#/all" :class="{ selected: visibility == 'all' }">All</a></li>
-            <li><a href="#/active" :class="{ selected: visibility == 'active' }">Active</a></li>
-            <li><a href="#/completed" :class="{ selected: visibility == 'completed' }">Completed</a></li>
+            <li><a href="#/all" :class="{ selected: visibility == 'all' }">全部</a></li>
+            <li><a href="#/active" :class="{ selected: visibility == 'active' }">活跃</a></li>
+            <li><a href="#/completed" :class="{ selected: visibility == 'completed' }">已完成</a></li>
           </ul>
           <button class="clear-completed" @click="removeCompleted" v-show="todos.length > remaining">
-            Clear completed
+            清除已完成项目
           </button>
         </footer>
         <p class="info userinfo">
-          Logged in as {{user.username}} (<a @click='logout'>Logout</a>)
+          账户为 {{user.username}}  (<a @click='logout'>按此登出</a>)
         </p>
       </template>
     </section>
     <footer class="info">
-      <p>Double-click to edit a todo</p>
-      <p>fork from <a href="https://vuejs.org/v2/examples/todomvc.html">Vue.js TodoMVC</a> / Powered by <a href="https://leancloud.cn">LeanCloud</a></p>
+
+      <p> Powered by <a href="https://leancloud.cn">LeanCloud</a></p>
     </footer>
     <a href="https://github.com/leancloud/leantodo-vue"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://t.cn/EbM8UDg" 
       alt="Fork me on GitHub" data-canonical-src="http://t.cn/zRGx5LY"></a>
