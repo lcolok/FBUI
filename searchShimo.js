@@ -78,10 +78,10 @@ function emoji(suffix) {
     return emoji;
 }
 
-function cutHTTP(shortURL) {
-    return shortURL;
-    //    return 't.cn/'+shortURL.split('/').pop();
-}
+
+function cutHTTP(input) {
+    return input.replace(/[a-zA-z]+:\/\//g, '');
+  }
 
 module.exports={
     search:searchLC

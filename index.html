@@ -59,7 +59,8 @@
               :class="{ completed: todo.done, editing: todo == editedTodo }">
               <div class="view">
                 <input class="toggle" type="checkbox" v-model="todo.done" @change="doneEdit(todo)">
-                <label @dblclick="editTodo(todo)">{{ todo.content }}</label>
+                <label @click="editTodo(todo)">{{ todo.content }}</label>
+                <!-- <label @dblclick="editTodo(todo)">{{ todo.content }}</label> -->
                 <button class="destroy" @click="removeTodo(todo)"></button>
               </div>
               <input class="edit" type="text"
