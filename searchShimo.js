@@ -1,6 +1,11 @@
-var AV = require('leancloud-storage');
+try{
+    var AV = require('leancloud-storage');
 var axios = require('axios');
 const Qs = require("qs");
+}catch(e){
+    
+}
+
 
 // 初始化存储 SDK
 AV.init({

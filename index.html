@@ -1,13 +1,13 @@
-
 <!doctype html>
 <html data-framework="vue">
-  <head>
-    <meta charset="utf-8">
-    <title>石墨床</title>
-    <link rel="shortcut icon" href="https://uploader.shimo.im/f/MC9Kef56SekGd61W.png">
-    <link rel="stylesheet" href="fbui.css">
-    <style>
-      [v-cloak] { display: none; }
+
+<head>
+  <meta charset="utf-8">
+  <title>石墨床</title>
+  <link rel="shortcut icon" href="https://uploader.shimo.im/f/MC9Kef56SekGd61W.png">
+  <link rel="stylesheet" href="fbui.css">
+  <style>
+    [v-cloak] { display: none; }
       .userinfo {
         position: absolute;
         bottom: -46px;
@@ -29,77 +29,72 @@
         background-color: #fafafa;
       }
     </style>
-  </head>
-  <body>
-    <section class="todoapp">
-      <h1>石墨床</h1>
-      <form action="#" id="login" v-on:submit.prevent="login" v-if="!user" v-cloak>
-        <input v-model="username" autofocus required class="new-todo" placeholder="用户名">
-        <input type="password" v-model="password" required class="new-todo" placeholder="密码">
-        <div class="control">
-          <input type="submit" value="登录" class="new-todo" id="login-button">
-          <input type="button" @click="signup" value="注册" class="new-todo">
-        </div>
-      </form>
-      <template v-if="user" v-cloak>
-        <header class="header">
-          <input class="new-todo"
-            v-if="user"
-            autofocus autocomplete="off"
-            placeholder="请输入搜索关键词"
-            v-model="newTodo"
-            @keyup.enter="searchShimo"><!--@keyup.enter="addTodo" 按下回车后执行动作 -->
+</head>
 
-        </header>
-        <section class="main" v-show="todos.length">
-          <input class="toggle-all" type="checkbox" v-model="allDone">
-          <ul class="todo-list">
-            <li v-for="todo in filteredTodos"
-              class="todo"
-              :key="todo.objectId"
-              :class="{ completed: todo.done, editing: todo == editedTodo }">
-              <div class="view">
-                <input class="toggle" type="checkbox" v-model="todo.done" @change="doneEdit(todo)">
-                <label @click="editTodo(todo)">{{ todo.content }}</label>
-                <!-- <label @dblclick="editTodo(todo)">{{ todo.content }}</label> -->
-                <button class="destroy" @click="removeTodo(todo)"></button>
-              </div>
-              <input class="edit" type="text"
-                v-model="todo.content"
-                v-todo-focus="todo == editedTodo"
-                @blur="doneEdit(todo)"
-                @keyup.enter="doneEdit(todo)"
-                @keyup.esc="cancelEdit(todo)">
-            </li>
-          </ul>
-        </section>
-        <footer class="footer" v-show="todos.length" v-cloak>
-          <span class="todo-count">
-            共 <strong>{{ remaining }}</strong> {{ remaining | pluralize }} 
-          </span>
-          <ul class="filters">
-            <li><a href="#/all" :class="{ selected: visibility == 'all' }">全部</a></li>
-            <li><a href="#/active" :class="{ selected: visibility == 'active' }">活跃</a></li>
-            <li><a href="#/completed" :class="{ selected: visibility == 'completed' }">已完成</a></li>
-          </ul>
-          <button class="clear-completed" @click="removeCompleted" v-show="todos.length > remaining">
-            清除已完成项目
-          </button>
-        </footer>
-        <p class="info userinfo">
-          账户为 {{user.username}}  (<a @click='logout'>按此登出</a>)
-        </p>
-      </template>
-    </section>
-    <footer class="info">
+<body>
 
-      <p> Powered by <a href="https://leancloud.cn">LeanCloud</a></p>
-    </footer>
-    <a href="https://github.com/leancloud/leantodo-vue"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://t.cn/EbM8UDg" 
+  <section class="todoapp">
+    <h1>石墨床</h1>
+    <form action="#" id="login" v-on:submit.prevent="login" v-if="!user" v-cloak>
+      <input v-model="username" autofocus required class="new-todo" placeholder="用户名">
+      <input type="password" v-model="password" required class="new-todo" placeholder="密码">
+      <div class="control">
+        <input type="submit" value="登录" class="new-todo" id="login-button">
+        <input type="button" @click="signup" value="注册" class="new-todo">
+      </div>
+    </form>
+    <template v-if="user" v-cloak>
+      <header class="header">
+        <input class="new-todo" v-if="user" autofocus autocomplete="off" placeholder="请输入搜索关键词" v-model="newTodo"
+          @keyup.enter="searchShimo">
+        <!--@keyup.enter="addTodo" 按下回车后执行动作 -->
+
+      </header>
+      <section class="main" v-show="todos.length">
+        <input class="toggle-all" type="checkbox" v-model="allDone">
+        <ul class="todo-list">
+          <li v-for="todo in filteredTodos" class="todo" :key="todo.objectId" :class="{ completed: todo.done, editing: todo == editedTodo }">
+            <div class="view">
+              <input class="toggle" type="checkbox" v-model="todo.done" @change="doneEdit(todo)">
+              <label @click="copy2Clipboard" style="cursor:pointer" id="btn" >{{ todo.content }}</label>
+              <!-- <label @dblclick="editTodo(todo)">{{ todo.content }}</label> -->
+              <button class="destroy" @click="removeTodo(todo)"></button>
+            </div>
+            <input class="edit" type="text" v-model="todo.content" v-todo-focus="todo == editedTodo" @blur="doneEdit(todo)"
+              @keyup.enter="doneEdit(todo)" @keyup.esc="cancelEdit(todo)">
+          </li>
+        </ul>
+      </section>
+      <footer class="footer" v-show="todos.length" v-cloak>
+        <span class="todo-count">
+          共 <strong>{{ remaining }}</strong> {{ remaining | pluralize }}
+        </span>
+        <ul class="filters">
+          <li><a href="#/all" :class="{ selected: visibility == 'all' }">全部</a></li>
+          <li><a href="#/active" :class="{ selected: visibility == 'active' }">活跃</a></li>
+          <li><a href="#/completed" :class="{ selected: visibility == 'completed' }">已完成</a></li>
+        </ul>
+        <button class="clear-completed" @click="removeCompleted" v-show="todos.length > remaining">
+          清除已完成项目
+        </button>
+      </footer>
+      <p class="info userinfo">
+        账户为 {{user.username}} (<a @click='logout'>按此登出</a>)
+      </p>
+     
+    </template>
+  </section>
+  <footer class="info">
+
+    <p> Powered by <a href="https://leancloud.cn">LeanCloud</a></p>
+  </footer>
+  <a href="https://github.com/leancloud/leantodo-vue"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://t.cn/EbM8UDg"
       alt="Fork me on GitHub" data-canonical-src="http://t.cn/zRGx5LY"></a>
-    <script src="https://unpkg.com/leancloud-storage@^3.0.0-beta.3/dist/av-live-query-min.js"></script>
-    <script src="https://unpkg.com/vue/dist/vue.js"></script>
-    <script src="app.js"></script>
-    <script src="searchShimo.js"></script>
-  </body>
+  <script src="https://unpkg.com/leancloud-storage@^3.0.0-beta.3/dist/av-live-query-min.js"></script>
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+  <script src="app.js"></script>
+  <script src="searchShimo.js"></script>
+</body>
+
 </html>

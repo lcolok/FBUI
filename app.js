@@ -162,7 +162,35 @@ var app = new Vue({
       })
       return todos
     },
+    copy2Clipboard:async function(){
 
+      const btns = document.querySelectorAll('btn');
+      
+      // var clipboard = new ClipboardJS(btn);
+
+      // clipboard.on('success', function (e) {
+      //   console.log(e);
+      // });
+
+      // clipboard.on('error', function (e) {
+      //   console.log(e);
+      // });
+
+
+      var clipboard = new ClipboardJS(btn, {
+        text: function(trigger) {
+            return trigger.textContent;//查看console.log,这里可以有很多种写法
+        }
+    });
+       clipboard.on('success', function (e) {
+        console.log(e);
+      });
+
+      clipboard.on('error', function (e) {
+        console.log(e);
+      });
+      // alert("成功复制")
+    },
     searchShimo: async function(){
 
       var key = this.newTodo;
