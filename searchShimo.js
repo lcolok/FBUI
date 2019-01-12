@@ -38,13 +38,19 @@ async function searchLC(key) {
 
         var dic = e.attributes;
 
-        // var output = `${dic.type} ${dic.name} | ${dic.shortURL}`;
-        var output = `${emoji(dic.type)} ${dic.name} | ${cutHTTP(dic.shortURL)}`;
+        var emoji = makeEmoji(dic.type);
 
-        if (!result.join().match(output)) {//去除重复项目
-            result.push(output);
-        }
+        var name = dic.name;
 
+        var shortURL = cutHTTP(dic.shortURL);
+
+        var copyContent = `${emoji} ${name} | ${shortURL}`;
+
+        dic.copyContent = copyContent;
+
+        dic.content = emoji + name;//在vue的todo里面content代表
+
+        result.push(dic);
     });
 
     return result;
@@ -52,7 +58,7 @@ async function searchLC(key) {
 
 
 
-function emoji(suffix) {
+function makeEmoji(suffix) {
     var emoji;
 
     if (suffix.match(/[a-zA-Z]/g)) {

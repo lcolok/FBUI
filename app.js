@@ -188,11 +188,7 @@ var app = new Vue({
  
       var result = await searchLC(key);
       // alert(JSON.stringify(this.todos[0]));
-      this.todos=[];
-      for(var i in result){
-        this.todos.push({content:result[i]});
-      }
-
+      this.todos=result;
     },
     
     addTodo: function () {
