@@ -163,10 +163,12 @@ var app = new Vue({
       return todos
     },
     copy2Clipboard:async function(){
+      
 
       const btns = document.querySelectorAll('btn');
       var clipboard = new ClipboardJS(btn, {
         text: function(trigger) {
+          console.log(trigger);
             return trigger.textContent;//查看console.log,这里可以有很多种写法
         }
     });
