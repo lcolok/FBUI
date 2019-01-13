@@ -162,14 +162,24 @@ var app = new Vue({
       })
       return todos
     },
+
+    toastShow:function(){
+      Vue.use(Toasted,{
+        position:'top-center',
+        theme:'bubble',
+        duration:1000,
+        fitToScreen:true
+      })
+      Vue.toasted.show(this.newTodo);
+    },
     copy2Clipboard:async function(){
       
 
       const btns = document.querySelectorAll('btn');
       var clipboard = new ClipboardJS(btn, {
         text: function(trigger) {
-          console.log(trigger);
-            return trigger.textContent;//查看console.log,这里可以有很多种写法
+          console.log(trigger.nextElementSibling.textContent);
+            return trigger.nextElementSibling.textContent;//查看console.log,这里可以有很多种写法
         }
     });
        clipboard.on('success', function (e) {
