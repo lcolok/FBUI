@@ -166,16 +166,16 @@ var app = new Vue({
     toastShow:function(){
       Vue.use(Toasted,{
         position:'top-center',
-        theme:'bubble',
+        theme:'toasted-primary',
         duration:1000,
-        fitToScreen:true
       })
-      Vue.toasted.show(this.newTodo);
-    },
+      Vue.toasted.show(`找不到关于“${this.newTodo}”的项目`);
+    }
+    ,
     copy2Clipboard:async function(){
       
 
-      const btns = document.querySelectorAll('btn');
+      var btns = document.querySelectorAll('btn');
       var clipboard = new ClipboardJS(btn, {
         text: function(trigger) {
           console.log(trigger.nextElementSibling.textContent);
@@ -184,6 +184,13 @@ var app = new Vue({
     });
        clipboard.on('success', function (e) {
         console.log(e);
+
+          Vue.use(Toasted,{
+            position:'top-center',
+            theme:'toasted-primary',
+            duration:1000,
+          })
+          Vue.toasted.show(`已复制`);
       });
 
       clipboard.on('error', function (e) {
@@ -192,12 +199,21 @@ var app = new Vue({
       // alert("成功复制")
     },
     searchShimo: async function(){
-
+      var result = "";
       var key = this.newTodo;
       if(!key){}//啥都没有输入的话
  
       var result = await searchLC(key);
       // alert(JSON.stringify(this.todos[0]));
+      if(result==""){
+        Vue.use(Toasted,{
+          position:'top-center',
+          theme:'toasted-primary',
+          duration:1000,
+        })
+        Vue.toasted.show(`找不到关于“${key}”的项目`);
+        return
+      }
       this.todos=result;
     },
     
