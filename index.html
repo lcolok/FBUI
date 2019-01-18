@@ -55,10 +55,13 @@
         <ul class="todo-list">
           <li v-for="todo in filteredTodos" class="todo" :key="todo.objectId" :class="{ completed: todo.done, editing: todo == editedTodo }">
             <div class="view">
-              <input class="toggle" type="checkbox" v-model="todo.done" @change="doneEdit(todo)">
-              <label @click="copy2Clipboard" style="cursor:pointer" id="btn">{{ todo.content }}</label>
-              <!-- <img src='https://img.shields.io/badge/CH%E6%96%87%E4%BB%B6-%E7%94%B5%E4%BF%A1-green.svg'></img> -->
+              <!-- <input class="toggle" type="checkbox" v-model="todo.done" @change="doneEdit(todo)"> -->
+              <label @click="copy2Clipboard" style="cursor:pointer" id="btn" class='ENVS'>{{ todo.content }}</label>
+              <!-- 上面ENS的意思就是指Emoji+Name+Vertical bar+ShortURL的首字母缩写,便于短链复制和分享 -->
               <div class="v-cloak">{{ todo.copyContent }}</div>
+
+              <!-- <img src='https://img.shields.io/badge/CH%E6%96%87%E4%BB%B6-%E7%94%B5%E4%BF%A1-green.svg'></img> -->
+
 
               <!-- <label @dblclick="editTodo(todo)">{{ todo.content }}</label> -->
               <button class="destroy" @click="removeTodo(todo)"></button>
@@ -88,8 +91,9 @@
     </template>
   </section>
   <footer class="info">
+    <img style="cursor:pointer" onclick="window.open('https://shimo.im/docs/K8CWmBMqMtYYpU1f')" src='https://img.shields.io/badge/%E6%96%B0%E4%B8%8A%E4%BC%A0%E4%B8%93%E7%94%A8-%E7%9F%B3%E5%A2%A8-lightgrey.svg?&logo=iCloud'>
     <p> Powered by <a href="https://leancloud.cn">LeanCloud</a></p>
-    
+
   </footer>
   <a href="https://github.com/leancloud/leantodo-vue"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67"
       alt="Fork me on GitHub" data-canonical-src="http://t.cn/zRGx5LY"></a>
@@ -100,7 +104,15 @@
   <script src="script/app.js"></script>
   <script src="script/searchShimo.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-toasted/1.1.26/vue-toasted.min.js"></script>
+  <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
+  <!-- 引入谷歌的Material Icons -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+    crossorigin="anonymous">
 
+  <script>
+    Vue.use(Toasted);
+
+  </script>
 </body>
 
 </html>

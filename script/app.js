@@ -63,13 +63,13 @@ var app = new Vue({
     password: '',
     user: null
   },
-  
-  created: function() {
+
+  created: function () {
     var user = AV.User.current()
     if (user) {
       // user.isAuthenticated().then(function(authenticated) {
       //   if (authenticated) {
-          this.user = user.toJSON()
+      this.user = user.toJSON()
       //   }
       // }.bind(this))
     }
@@ -102,7 +102,7 @@ var app = new Vue({
       },
       set: function (done) {
         AV.Object.saveAll(
-          filters[done ? 'active' : 'completed'](this.todos).map(function(todo) {
+          filters[done ? 'active' : 'completed'](this.todos).map(function (todo) {
             todo.done = done
             return AV.Object.createWithoutData('Todo', todo.objectId).set('done', done)
           })
@@ -120,103 +120,156 @@ var app = new Vue({
   // methods that implement data logic.
   // note there's no DOM manipulation here at all.
   methods: {
-    fetchTodos: function(id) {
+    fetchTodos: function (id) {
       const query = new AV.Query(Todo)
         .equalTo('user', AV.Object.createWithoutData('User', id))
         .descending('createdAt')
       const updateTodos = this.updateTodos.bind(this)
       return AV.Promise.all([query.find().then(updateTodos), query.subscribe()])
-        .then(function([todos, subscription]) {
+        .then(function ([todos, subscription]) {
           this.subscription = subscription
           this.unbind = bind(subscription, todos, updateTodos)
         }.bind(this))
         .catch(alert)
     },
 
-    login: function() {
-      AV.User.logIn(this.username, this.password).then(function(user) {
-        this.user = user.toJSON()
-        this.username = this.password = ''
-      }.bind(this)).catch(alert)
-    },
-    
-    signup: function() {
-      alert("暂时不开放注册。")
-      return
-      AV.User.signUp(this.username, this.password).then(function(user) {
+    login: function () {
+      AV.User.logIn(this.username, this.password).then(function (user) {
         this.user = user.toJSON()
         this.username = this.password = ''
       }.bind(this)).catch(alert)
     },
 
-    logout: function() {
+    signup: function () {
+
+  
+      Vue.toasted.show(`暂时不开放注册`, {
+        position: 'top-center',
+        theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
+        duration: 3000,
+        iconPack: 'fontawesome',
+        icon: { name: "exclamation-triangle" },
+        fitToScreen: "true",
+        type: "error",//Type of the Toast ['success', 'info', 'error']
+        singleton: "true",
+        // fullWidth:"true",
+      });
+
+      return
+      AV.User.signUp(this.username, this.password).then(function (user) {
+        this.user = user.toJSON()
+        this.username = this.password = ''
+      }.bind(this)).catch(alert)
+    },
+
+    logout: function () {
       AV.User.logOut()
       this.user = null
       this.subscription.unsubscribe()
       this.unbind()
     },
-    
-    updateTodos: function(todos) {
-      this.todos = todos.map(function(todo) {
+
+    updateTodos: function (todos) {
+      this.todos = todos.map(function (todo) {
         return todo.toJSON()
       })
       return todos
     },
 
-    toastShow:function(){
-      Vue.use(Toasted,{
-        position:'top-center',
-        theme:'toasted-primary',
-        duration:1000,
-      })
-      Vue.toasted.show(`找不到关于“${this.newTodo}”的项目`);
+    toastShow: function () {
+      Vue.toasted.show(`找不到关于“${this.newTodo}”的项目`, {
+        position: 'top-center',
+        theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
+        duration: 3000,
+        icon: { name: "search" },
+        iconPack: 'fontawesome',
+        fitToScreen: "true",
+        type: "error"//Type of the Toast ['success', 'info', 'error']
+        // fullWidth:"true",
+      });
     }
     ,
-    copy2Clipboard:async function(){
-      
-
-      var btns = document.querySelectorAll('btn');
-      var clipboard = new ClipboardJS(btn, {
-        text: function(trigger) {
+    copy2Clipboard: function () {
+      var clipboard = new ClipboardJS('.ENVS', {
+        text: function (trigger) {
           console.log(trigger.nextElementSibling.textContent);
-            return trigger.nextElementSibling.textContent;//查看console.log,这里可以有很多种写法
+          return trigger.nextElementSibling.textContent;//查看console.log,这里可以有很多种写法
         }
-    });
-       clipboard.on('success', function (e) {
+      });
+      clipboard.on('success', function (e) {
         console.log(e);
 
-          Vue.use(Toasted,{
-            position:'top-center',
-            theme:'toasted-primary',
-            duration:1000,
-          })
-          Vue.toasted.show(`已复制`);
+        Vue.toasted.success(`已复制`,{
+          position: 'top-center',
+          theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
+          duration: 1000,
+          iconPack: 'fontawesome',
+          icon: { name: "copy" },
+          fitToScreen: "true",
+          type: "success"//Type of the Toast ['success', 'info', 'error']
+          // fullWidth:"true",
+        });
+        clipboard.destroy();
       });
 
       clipboard.on('error', function (e) {
         console.log(e);
       });
+
       // alert("成功复制")
+
+
     },
-    searchShimo: async function(){
+    searchShimo: async function () {
       var result = "";
       var key = this.newTodo;
-      if(!key){}//啥都没有输入的话
- 
-      var result = await searchLC(key);
-      // alert(JSON.stringify(this.todos[0]));
-      if(result==""){
-        Vue.use(Toasted,{
-          position:'top-center',
-          theme:'toasted-primary',
-          duration:1000,
-        })
-        Vue.toasted.show(`找不到关于“${key}”的项目`);
-        return
+      if (!key) {
+        var data = await AV.Cloud.run('updateShimo');
+        console.log(data);
+
+          if(data>0){
+            showUpdate(data);
+          }else{
+            showTop20();
+
+          }
+
+          var query = new AV.Query('ShimoBed');
+          query.descending("updatedAt");
+          query.limit(20);//请求数量上限为1000条
+          var every = await query.find();
+
+          console.log(every);
+          console.log(makeAList(every));
+          result = makeAList(every);
+
+      }else{
+
+        var result = await searchLC(key);
+        // alert(JSON.stringify(this.todos[0]));
+        if (result == "") {
+   
+          Vue.toasted.show(`找不到关于“${key}”的项目`,{
+            position: 'top-center',
+            theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
+            duration: 3000,
+            icon: { name: "search" },
+            iconPack: 'fontawesome',
+            fitToScreen: "true",
+            type: "error"//Type of the Toast ['success', 'info', 'error']
+            // fullWidth:"true",
+          });
+          return
+        }
       }
-      this.todos=result;
+
+      console.log(result);
+      this.todos = result;
+
+
+
     },
-    
+
     addTodo: function () {
       var value = this.newTodo && this.newTodo.trim()
       if (!value) {
@@ -231,7 +284,7 @@ var app = new Vue({
         content: value,
         done: false,
         user: AV.User.current()
-      }).setACL(acl).save().then(function(todo) {
+      }).setACL(acl).save().then(function (todo) {
         this.todos.push(todo.toJSON())
         // alert(JSON.stringify(todo.toJSON()));
       }.bind(this)).catch(alert)
@@ -241,7 +294,7 @@ var app = new Vue({
     removeTodo: function (todo) {
       AV.Object.createWithoutData('Todo', todo.objectId)
         .destroy()
-        .then(function() {
+        .then(function () {
           this.todos.splice(this.todos.indexOf(todo), 1)
         }.bind(this))
         .catch(alert)
@@ -270,9 +323,9 @@ var app = new Vue({
     },
 
     removeCompleted: function () {
-      AV.Object.destroyAll(filters.completed(this.todos).map(function(todo) {
+      AV.Object.destroyAll(filters.completed(this.todos).map(function (todo) {
         return AV.Object.createWithoutData('Todo', todo.objectId)
-      })).then(function() {
+      })).then(function () {
         this.todos = filters.active(this.todos)
       }.bind(this)).catch(alert)
     }
@@ -291,7 +344,7 @@ var app = new Vue({
 })
 
 // handle routing
-function onHashChange () {
+function onHashChange() {
   var visibility = window.location.hash.replace(/#\/?/, '')
   if (filters[visibility]) {
     app.visibility = visibility
@@ -301,8 +354,73 @@ function onHashChange () {
   }
 }
 
+function showError(text) {
+
+  Vue.toasted.show(text,{
+    position: 'top-center',
+    theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
+    duration: 0,
+    icon: { name: "error" },
+    iconPack: 'fontawesome',
+    fitToScreen: "true",
+    type: "error",//Type of the Toast ['success', 'info', 'error']
+    singleton: "true",
+    action: {
+
+      text: 'Cancel',
+      onClick: (e, toastObject) => {
+        toastObject.goAway(0);
+
+      },
+    }
+    // fullWidth:"true",
+  });
+}
+
+function showUpdate(count) {
 
 
+  Vue.toasted.success(`新增${count}条记录`, {
+    position: 'top-center',
+    theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
+    duration: 3000,
+    icon: { name: "sync-alt" },
+    iconPack: 'fontawesome',
+    fitToScreen: "true",
+    type: "success",//Type of the Toast ['success', 'info', 'error']
+    singleton: "true",
+    // fullWidth:"true",
+  });
+}
+
+function showTop20() {
+  Vue.toasted.info(`已为你显示最近20条记录`,{
+    position: 'top-center',
+    theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
+    duration: 3000,
+    icon: { name: "eye" },
+    iconPack: 'fontawesome',
+    fitToScreen: "true",
+    type: "success",//Type of the Toast ['success', 'info', 'error']
+    singleton: "true",
+    // fullWidth:"true",
+  });
+}
+
+function toastInput() {
+
+  Vue.toasted.show(`请输入关键词进行搜索`, {
+    position: 'top-center',
+    theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
+    duration: 3000,
+    icon: { name: "question-circle" },
+    iconPack: 'fontawesome',
+    fitToScreen: "true",
+    type: "info",//Type of the Toast ['success', 'info', 'error']
+    singleton: "true",
+    // fullWidth:"true",
+  });
+}
 
 window.addEventListener('hashchange', onHashChange)
 onHashChange()

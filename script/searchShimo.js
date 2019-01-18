@@ -1,9 +1,9 @@
-try{
+try {
     var AV = require('leancloud-storage');
-var axios = require('axios');
-const Qs = require("qs");
-}catch(e){
-    
+    var axios = require('axios');
+    const Qs = require("qs");
+} catch (e) {
+
 }
 
 
@@ -30,8 +30,12 @@ async function searchLC(key) {
     var query = new AV.SearchQuery('ShimoBed');//class名
     query.queryString(key);//要搜索的关键词
     var resp = await query.find();
-
+    console.info(resp);
     //    console.log("找到了 " + query.hits() + " 个文件.");
+    return makeAList(resp);
+}
+
+function makeAList(resp){
     var result = [];
 
     resp.forEach(e => {
@@ -53,10 +57,9 @@ async function searchLC(key) {
         result.push(dic);
     });
 
+
     return result;
 }
-
-
 
 function makeEmoji(suffix) {
     var emoji;
@@ -92,8 +95,9 @@ function makeEmoji(suffix) {
 
 function cutHTTP(input) {
     return input.replace(/[a-zA-z]+:\/\//g, '');
-  }
+}
 
-module.exports={
-    search:searchLC
+module.exports = {
+    search: searchLC,
+    makeAList:makeAList
 }
