@@ -156,7 +156,7 @@ async function postDiscussion(fileID, content) {
         console.log('讨论上传失败，错误信息：『' + resp.message + '』\n' + "详情请查看：" + "https://shimo.im/docs/" + fileID);
         return "error";
     } else {
-        return "success"
+        return resp.data;
     }
 
 
@@ -257,7 +257,8 @@ function emoji(suffix) {
 function addItem(dic) {
 
     var file = new ShimoBed();
-
+    file.set('unixus', dic.unixus);
+    file.set('id', dic.id);
     file.set('type', dic.type);
     file.set('name', dic.name);
     file.set('name_trans', dic.name_trans);
@@ -311,7 +312,7 @@ async function update(newDiscussionID, getAttachmentID) {//更新上传专用的
         var shortURL = await shortenURL(attachment.url);
 
         dic = {
-            type: realName[1],
+            type: realName.pop(),
             name: name,
             shortURL: shortURL,
             name_trans: await googleTranslateByPost(name.toLowerCase()),
@@ -322,7 +323,10 @@ async function update(newDiscussionID, getAttachmentID) {//更新上传专用的
         content = JSON.stringify(dic);
 
 
-        postDiscussion(newDiscussionID, content);//上传到评论区
+        var resp = await postDiscussion(newDiscussionID, content);//上传到评论区
+
+            dic.id = resp.data.id;
+            dic.unixus = resp.data.unixus;
 
         addItem(dic);//上传到leancloud的数据储存
 

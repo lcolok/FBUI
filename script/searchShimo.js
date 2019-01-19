@@ -50,6 +50,8 @@ function makeAList(resp){
 
         var copyContent = `${emoji} ${name} | ${shortURL}`;
 
+        dic.objectId = e.id;
+
         dic.copyContent = copyContent;
 
         dic.content = emoji + name;//在vue的todo里面content代表

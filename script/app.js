@@ -192,13 +192,60 @@ var app = new Vue({
     multiSelection: function () {
 
     },
+    playVideo: function (todo) {
+      console.log(todo);
+      if (todo.uploaderURL) {
+        window.open(todo.uploaderURL);
+      } else {
+        window.open(todo.shortURL);
+      }
+
+    },
+    download: function (todo) {
+      console.log(todo);
+      if (todo.uploaderURL) {
+        window.location.href = todo.uploaderURL + '?&download';
+      } else {
+        window.location.href = todo.shortURL;
+      }
+
+
+    },
+    deleteContent: async function (todo) {
+      if (todo.id) {
+        var r = confirm("确定要删除此项目?");
+        if (r == true) {
+
+          AV.Cloud.run('deleteContent', {
+            id: todo.id,
+          });
+          console.log(todo.objectId);
+          // console.log(this.todos);
+          AV.Object.createWithoutData('ShimoBed', todo.objectId)
+            .destroy()
+            .then(function () {
+              this.todos.splice(this.todos.indexOf(todo), 1)
+            }.bind(this))
+            .catch(alert);
+        }
+        else {
+
+        }
+
+
+      } else {
+        showError("没有石墨评论id号,无法删除!");
+      }
+
+
+    },
     copyAll: async function () {
       var all = await filters.completed(this.todos).map(function (todo) {
         return todo;
       });
       console.log(all);
       var clipboard = new ClipboardJS('.clear-completed', {
-    
+
         text: function (trigger) {
           var copyAllContent = [];
           all.forEach(e => {
@@ -209,7 +256,7 @@ var app = new Vue({
       });
       clipboard.on('success', function (e) {
         console.log(e);
-    
+
         Vue.toasted.success(`已复制`, {
           position: 'top-center',
           theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
@@ -223,22 +270,23 @@ var app = new Vue({
         });
         clipboard.destroy();
       });
-    
+
       clipboard.on('error', function (e) {
         console.log(e);
       });
-    
+
     }
     ,
-    copy2Clipboard: async function () {
+    copy2Clipboard: async function (todo) {
+      console.log(todo);
 
       var all = await filters.completed(this.todos).map(function (todo) {
         return todo;
       });
-      console.log(all);
+
       if (all.length > 0) {
         var clipboard = new ClipboardJS('.ENVS', {
-      
+
           text: function (trigger) {
             var copyAllContent = [];
             all.forEach(e => {
@@ -249,11 +297,11 @@ var app = new Vue({
         });
         clipboard.on('success', function (e) {
           console.log(e);
-      
-          Vue.toasted.success(`已复制`, {
+
+          Vue.toasted.success(`已复制选中的${all.length}项`, {
             position: 'top-center',
             theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
-            duration: 1000,
+            duration: 3000,
             iconPack: 'fontawesome',
             icon: { name: "copy" },
             fitToScreen: "true",
@@ -263,16 +311,15 @@ var app = new Vue({
           });
           clipboard.destroy();
         });
-      
+
         clipboard.on('error', function (e) {
           console.log(e);
         });
-      
+
       } else {
         var clipboard = new ClipboardJS('.ENVS', {
           text: function (trigger) {
-            console.log(trigger.nextElementSibling.textContent);
-            return trigger.nextElementSibling.textContent;//查看console.log,这里可以有很多种写法
+            return todo.copyContent;
           }
         });
         clipboard.on('success', function (e) {
@@ -322,9 +369,9 @@ var app = new Vue({
         var every = await query.find();
 
         console.log(every);
-        console.log(makeAList(every));
-        result = makeAList(every);
 
+        result = makeAList(every);
+        // console.log(result);
       } else {
 
         var result = await searchLC(key);

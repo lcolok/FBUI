@@ -37,6 +37,8 @@ body {
 	outline: 0;
 }
 
+
+
 .hidden {
 	display: none;
 }
@@ -233,6 +235,12 @@ body {
 .todo-list li.completed label {
 	color: #d9d9d9;
 	text-decoration: line-through;
+}
+
+.todo-list li .playVideoBTN:after {
+	content: '播放';  
+	 
+	cursor:pointer;
 }
 
 .todo-list li .destroy {

@@ -75,9 +75,15 @@
 
               <input class="toggle" type="checkbox" v-model="todo.done" @change="multiSelection()">
 
-              <label @click="copy2Clipboard" style="cursor:pointer" id="btn" class='ENVS'>{{ todo.content }}</label>
+              <label >
+                <span @click="copy2Clipboard(todo)" style="cursor:pointer" id="btn" class='ENVS'>{{ todo.content }} </span>
+                <div class="v-cloak">{{ todo.copyContent }}</div>
+                <button title="播放" @click="playVideo(todo)" style="cursor:pointer; font-size: 1em; color: Tomato;"><i class="fas fa-play-circle"></i></button>
+                <button title="下载" @click="download(todo)" style="cursor:pointer; font-size: 1em; color: Dodgerblue;"><i class="fas fa-arrow-alt-circle-down"></i></button>
+                <button title="删除" @click="deleteContent(todo)" style="cursor:pointer; font-size: 1em; color: Mediumslateblue;"><i class="fas fa-trash-alt"></i></button>
+              </label>
               <!-- 上面ENS的意思就是指Emoji+Name+Vertical bar+ShortURL的首字母缩写,便于短链复制和分享 -->
-              <div class="v-cloak">{{ todo.copyContent }}</div>
+              
 
               <!-- <img src='https://img.shields.io/badge/CH%E6%96%87%E4%BB%B6-%E7%94%B5%E4%BF%A1-green.svg'></img> -->
 
@@ -113,7 +119,7 @@
     </template>
   </section>
   <footer class="info">
-    <p> Powered by <a href="https://leancloud.cn">LeanCloud</a></p>
+    <p> Powered by <a onclick="window.open('https://leancloud.cn/dashboard/data.html?appid=Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz#/ShimoBed')" href="">LeanCloud</a></p>
 
   </footer>
   <a href="https://github.com/leancloud/leantodo-vue"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67"
