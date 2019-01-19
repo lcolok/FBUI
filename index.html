@@ -78,9 +78,9 @@
               <label >
                 <span @click="copy2Clipboard(todo)" style="cursor:pointer" id="btn" class='ENVS'>{{ todo.content }} </span>
                 <div class="v-cloak">{{ todo.copyContent }}</div>
-                <button title="播放" @click="playVideo(todo)" style="cursor:pointer; font-size: 1em; color: Tomato;"><i class="fas fa-play-circle"></i></button>
-                <button title="下载" @click="download(todo)" style="cursor:pointer; font-size: 1em; color: Dodgerblue;"><i class="fas fa-arrow-alt-circle-down"></i></button>
-                <button title="删除" @click="deleteContent(todo)" style="cursor:pointer; font-size: 1em; color: Mediumslateblue;"><i class="fas fa-trash-alt"></i></button>
+                <button title="播放"  style="cursor:pointer; font-size: 1em; color: Tomato;"><i class="fas fa-play-circle" @click="playVideo(todo)"></i></button>
+                <button title="下载"  style="cursor:pointer; font-size: 1em; color: Dodgerblue;"><i class="fas fa-arrow-alt-circle-down" @click="download(todo)"></i></button>
+                <button title="删除"  style="cursor:pointer; font-size: 1em; color: Mediumslateblue;"><i class="fas fa-trash-alt" @click="deleteContent(todo)"></i></button>
               </label>
               <!-- 上面ENS的意思就是指Emoji+Name+Vertical bar+ShortURL的首字母缩写,便于短链复制和分享 -->
               
@@ -90,7 +90,7 @@
 
               <!-- <label @dblclick="editTodo(todo)">{{ todo.content }}</label> -->
 
-              <button class="destroy" @click="removeTodo(todo)"></button>
+              <!-- <button class="destroy" @click="removeTodo(todo)"></button>   -->
 
             </div>
             <input class="edit" type="text" v-model="todo.content" v-todo-focus="todo == editedTodo" @blur="doneEdit(todo)"
