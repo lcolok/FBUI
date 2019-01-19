@@ -242,6 +242,7 @@ body {
 
 .todo-list li .destroy:after {
 	content: '×';
+
 }
 
 .todo-list li:hover .destroy {

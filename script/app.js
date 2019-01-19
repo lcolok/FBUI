@@ -142,7 +142,7 @@ var app = new Vue({
 
     signup: function () {
 
-  
+
       Vue.toasted.show(`暂时不开放注册`, {
         position: 'top-center',
         theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
@@ -189,34 +189,116 @@ var app = new Vue({
       });
     }
     ,
-    copy2Clipboard: function () {
-      var clipboard = new ClipboardJS('.ENVS', {
+    multiSelection: function () {
+
+    },
+    copyAll: async function () {
+      var all = await filters.completed(this.todos).map(function (todo) {
+        return todo;
+      });
+      console.log(all);
+      var clipboard = new ClipboardJS('.clear-completed', {
+    
         text: function (trigger) {
-          console.log(trigger.nextElementSibling.textContent);
-          return trigger.nextElementSibling.textContent;//查看console.log,这里可以有很多种写法
+          var copyAllContent = [];
+          all.forEach(e => {
+            copyAllContent.push(e.copyContent);
+          });
+          return copyAllContent.join('\n');
         }
       });
       clipboard.on('success', function (e) {
         console.log(e);
-
-        Vue.toasted.success(`已复制`,{
+    
+        Vue.toasted.success(`已复制`, {
           position: 'top-center',
           theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
           duration: 1000,
           iconPack: 'fontawesome',
           icon: { name: "copy" },
           fitToScreen: "true",
-          type: "success"//Type of the Toast ['success', 'info', 'error']
+          type: "success",//Type of the Toast ['success', 'info', 'error']
+          singleton: "true",
           // fullWidth:"true",
         });
         clipboard.destroy();
       });
-
+    
       clipboard.on('error', function (e) {
         console.log(e);
       });
+    
+    }
+    ,
+    copy2Clipboard: async function () {
 
-      // alert("成功复制")
+      var all = await filters.completed(this.todos).map(function (todo) {
+        return todo;
+      });
+      console.log(all);
+      if (all.length > 0) {
+        var clipboard = new ClipboardJS('.ENVS', {
+      
+          text: function (trigger) {
+            var copyAllContent = [];
+            all.forEach(e => {
+              copyAllContent.push(e.copyContent);
+            });
+            return copyAllContent.join('\n');
+          }
+        });
+        clipboard.on('success', function (e) {
+          console.log(e);
+      
+          Vue.toasted.success(`已复制`, {
+            position: 'top-center',
+            theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
+            duration: 1000,
+            iconPack: 'fontawesome',
+            icon: { name: "copy" },
+            fitToScreen: "true",
+            type: "success",//Type of the Toast ['success', 'info', 'error']
+            singleton: "true",
+            // fullWidth:"true",
+          });
+          clipboard.destroy();
+        });
+      
+        clipboard.on('error', function (e) {
+          console.log(e);
+        });
+      
+      } else {
+        var clipboard = new ClipboardJS('.ENVS', {
+          text: function (trigger) {
+            console.log(trigger.nextElementSibling.textContent);
+            return trigger.nextElementSibling.textContent;//查看console.log,这里可以有很多种写法
+          }
+        });
+        clipboard.on('success', function (e) {
+          console.log(e);
+
+          Vue.toasted.success(`已复制`, {
+            position: 'top-center',
+            theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
+            duration: 1000,
+            iconPack: 'fontawesome',
+            icon: { name: "copy" },
+            fitToScreen: "true",
+            type: "success",//Type of the Toast ['success', 'info', 'error']
+            singleton: "true",
+            // fullWidth:"true",
+          });
+          clipboard.destroy();
+        });
+
+        clipboard.on('error', function (e) {
+          console.log(e);
+        });
+      }
+
+
+
 
 
     },
@@ -227,29 +309,29 @@ var app = new Vue({
         var data = await AV.Cloud.run('updateShimo');
         console.log(data);
 
-          if(data>0){
-            showUpdate(data);
-          }else{
-            showTop20();
+        if (data > 0) {
+          showUpdate(data);
+        } else {
+          showTop20();
 
-          }
+        }
 
-          var query = new AV.Query('ShimoBed');
-          query.descending("updatedAt");
-          query.limit(20);//请求数量上限为1000条
-          var every = await query.find();
+        var query = new AV.Query('ShimoBed');
+        query.descending("updatedAt");
+        query.limit(20);//请求数量上限为1000条
+        var every = await query.find();
 
-          console.log(every);
-          console.log(makeAList(every));
-          result = makeAList(every);
+        console.log(every);
+        console.log(makeAList(every));
+        result = makeAList(every);
 
-      }else{
+      } else {
 
         var result = await searchLC(key);
         // alert(JSON.stringify(this.todos[0]));
         if (result == "") {
-   
-          Vue.toasted.show(`找不到关于“${key}”的项目`,{
+
+          Vue.toasted.show(`找不到关于“${key}”的项目`, {
             position: 'top-center',
             theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
             duration: 3000,
@@ -305,6 +387,7 @@ var app = new Vue({
       this.editedTodo = todo
     },
 
+
     doneEdit: function (todo) {
       this.editedTodo = null
       todo.content = todo.content.trim()
@@ -356,7 +439,7 @@ function onHashChange() {
 
 function showError(text) {
 
-  Vue.toasted.show(text,{
+  Vue.toasted.show(text, {
     position: 'top-center',
     theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
     duration: 0,
@@ -394,7 +477,7 @@ function showUpdate(count) {
 }
 
 function showTop20() {
-  Vue.toasted.info(`已为你显示最近20条记录`,{
+  Vue.toasted.info(`已为你显示最近20条记录`, {
     position: 'top-center',
     theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
     duration: 3000,
@@ -420,7 +503,7 @@ function toastInput() {
     singleton: "true",
     // fullWidth:"true",
   });
-}
+};
 
 window.addEventListener('hashchange', onHashChange)
 onHashChange()
