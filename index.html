@@ -48,7 +48,10 @@
   </footer>
   <section class="todoapp">
     <h1>石墨床</h1>
-
+    <h2>一句话使用说明:
+      按回车显示最近更新的20条短链
+      <!-- <img src="assets/keyboard-key-enter.svg" width="15px"> -->
+    </h2>
     <form action="#" id="login" v-on:submit.prevent="login" v-if="!user" v-cloak>
       <input v-model="username" autofocus required class="new-todo" placeholder="用户名">
       <input type="password" v-model="password" required class="new-todo" placeholder="密码">
@@ -71,7 +74,7 @@
             <div class="view">
 
               <input class="toggle" type="checkbox" v-model="todo.done" @change="multiSelection()">
-              
+
               <label @click="copy2Clipboard" style="cursor:pointer" id="btn" class='ENVS'>{{ todo.content }}</label>
               <!-- 上面ENS的意思就是指Emoji+Name+Vertical bar+ShortURL的首字母缩写,便于短链复制和分享 -->
               <div class="v-cloak">{{ todo.copyContent }}</div>
@@ -80,7 +83,7 @@
 
 
               <!-- <label @dblclick="editTodo(todo)">{{ todo.content }}</label> -->
-    
+
               <button class="destroy" @click="removeTodo(todo)"></button>
 
             </div>
@@ -104,9 +107,9 @@
       </footer>
       <p class="info userinfo">
         <span>账户为 {{user.username}} (<a @click='logout' style="cursor:pointer">按此登出</a>)</span>
-        <button style="cursor:pointer" @click="toastShow"  v-if="user" v-cloak >测试吐司</button>  
+        <button style="cursor:pointer" @click="toastShow" v-if="user" v-cloak>测试吐司</button>
       </p>
- 
+
     </template>
   </section>
   <footer class="info">
@@ -122,13 +125,13 @@
   <script src="script/app.js"></script>
   <script src="script/searchShimo.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-toasted/1.1.26/vue-toasted.min.js"></script>
-  <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <!-- 引入谷歌的Material Icons -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
     crossorigin="anonymous">
 
   <script>
-    Vue.use(Toasted,{
+    Vue.use(Toasted, {
       singleton: "true",
     });
 

@@ -69,12 +69,25 @@ body {
 
 .todoapp h1 {
 	position: absolute;
-	top: -155px;
+	top: -150px;
 	width: 100%;
-	font-size: 100px;
+	font-size: 70px;
 	font-weight: 100;
 	text-align: center;
 	color: rgba(11, 113, 247, 0.685);
+	-webkit-text-rendering: optimizeLegibility;
+	-moz-text-rendering: optimizeLegibility;
+	text-rendering: optimizeLegibility;
+}
+
+.todoapp h2 {
+	position: absolute;
+	top: -45px;
+	width: 100%;
+	font-size: 15px;
+	font-weight: 400;
+	text-align: center;
+	color: rgba(143, 143, 143, 0.685);
 	-webkit-text-rendering: optimizeLegibility;
 	-moz-text-rendering: optimizeLegibility;
 	text-rendering: optimizeLegibility;
