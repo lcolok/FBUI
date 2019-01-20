@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Dplayer Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="never" />
+    <meta name="referrer" content="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dplayer@1.25.0/dist/DPlayer.min.css">
+    <div id="dplayer"></div>
+    <style>
+        #dplayer {
+            max-width: 960px;
+            
+            /* height: 620px; */
+            margin: 0 auto;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="dplayer"></div>
+    <script src="https://cdn.jsdelivr.net/npm/dplayer@1.25.0/dist/DPlayer.min.js"></script>
+    <script>
+        const dp = new DPlayer({
+            container: document.getElementById('dplayer'),
+            screenshot: true,
+            video: {
+                url: 'https://attachments-cdn.shimo.im/er7kYjsAK5A4OsrB/%E5%96%AE%E8%BB%8A%E7%99%BE%E8%90%AC%E8%A1%8C2019_-_%E5%8D%81%E5%91%A8%E5%B9%B4%E5%AE%A3%E5%82%B3%E7%9F%AD%E7%89%87.mp4?e=1547976321&token=FYM7KChSxT-8Gcpg_aWrJfeQJeszI30W9RGXKyHO:ww02u0LE3Xqq-D09lBDtCFedZ6w=',
+                // pic: 'demo.jpg',
+                // thumbnails: 'thumbnails.jpg'
+            },
+            theme:"#b7da00",
+            mutex: true,
+            logo: '../assets/UploadCloud.png',
+            
+        });
+    </script>
+</body>
+
+</html>
