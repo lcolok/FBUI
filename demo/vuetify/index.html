@@ -9,9 +9,8 @@
   <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'>
   <link rel='stylesheet' href='https://unpkg.com/vuetify/dist/vuetify.min.css'>
   <link rel="stylesheet" href="css/style.css">
-
-
-
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+<!-- 以上这句代码用于适配手机 -->
 </head>
 
 <body>
@@ -28,6 +27,25 @@
       
       <v-content>
 
+          <div>
+              <div class="text-xs-center">
+                <v-btn
+                  color="primary"
+                  @click="alert = !alert"
+                >
+                  Toggle
+                </v-btn>
+              </div>
+              <v-alert
+                :value="alert"
+                type="info"
+                transition="scale-transition"
+                dismissible
+                
+              >
+                This is a success alert.
+              </v-alert>
+            </div>
           
         <v-container fluid>
           <v-layout align-center justify-center>
@@ -75,25 +93,7 @@
           </v-layout>
         </v-container>
 
-        <div>
-            <div class="text-xs-center">
-              <v-btn
-                color="primary"
-                @click="alert = !alert"
-              >
-                Toggle
-              </v-btn>
-            </div>
-            <v-alert
-              :value="alert"
-              type="info"
-              transition="scale-transition"
-              dismissible
-              
-            >
-              This is a success alert.
-            </v-alert>
-          </div>
+
 
       </v-content>
       
