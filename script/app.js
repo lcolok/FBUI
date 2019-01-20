@@ -195,11 +195,11 @@ var app = new Vue({
     playVideo: function (todo) {
       console.log(todo);
       if (todo.uploaderURL) {
-        // window.open(todo.uploaderURL);
-        window.open('javascript:window.name;', '<script>location.replace("'+ todo.uploaderURL +'")<\/script>');
+        window.open(todo.uploaderURL);
+        // window.open('javascript:window.name;', '<script>location.replace("'+ todo.uploaderURL +'")<\/script>');
       } else {
-        // window.open(todo.shortURL);
-        window.open('javascript:window.name;', '<script>location.replace("'+ todo.shortURL +'")<\/script>');
+        window.open(todo.shortURL);
+        // window.open('javascript:window.name;', '<script>location.replace("'+ todo.shortURL +'")<\/script>');
       }
 
     },
