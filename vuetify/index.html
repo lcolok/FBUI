@@ -6,16 +6,18 @@
   <meta name="referrer" content="never" />
   <meta name="referrer" content="no-referrer" />
   <title>石墨床VUE</title>
+  <link rel="shortcut icon" href="assets/UploadCloud.png">
   <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'>
   <link rel='stylesheet' href='https://unpkg.com/vuetify/dist/vuetify.min.css'>
   <link rel="stylesheet" href="css/style.css">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-<!-- 以上这句代码用于适配手机 -->
+  <!-- 以上这句代码用于适配手机 -->
 </head>
 
 <body>
 
   <div id="app">
+
     <v-app id="sandbox" :dark="dark">
       <v-navigation-drawer v-model="primaryDrawer.model" :permanent="primaryDrawer.type === 'permanent'" :temporary="primaryDrawer.type === 'temporary'"
         :clipped="primaryDrawer.clipped" :floating="primaryDrawer.floating" :mini-variant="primaryDrawer.mini" absolute
@@ -24,43 +26,43 @@
         <v-toolbar-side-icon v-if="primaryDrawer.type !== 'permanent'" @click.stop="primaryDrawer.model = !primaryDrawer.model"></v-toolbar-side-icon>
         <v-toolbar-title>石墨床VUE</v-toolbar-title>
       </v-toolbar>
-      
+
       <v-content>
 
-          <div>
-              <div class="text-xs-center">
-                <v-btn
-                  color="primary"
-                  @click="alert = !alert"
-                >
-                  Toggle
-                </v-btn>
-              </div>
-              <v-alert
-                :value="alert"
-                type="info"
-                transition="scale-transition"
-                dismissible
-                
-              >
-                This is a success alert.
-              </v-alert>
-            </div>
-          
+
+
         <v-container fluid>
+
           <v-layout align-center justify-center>
+            <v-flex xs10>
+
+              <v-text-field v-model="keyword" label="搜索" prepend-inner-icon="search" solo clearable autofocus
+                v-on:input="searchByKeyword(500)" @keydown.enter="searchByKeyword(0)" loading hint="随便搜点什么吧..."
+                :rules="[rules.required,rules.counter]">
+                <v-scale-transition slot="append">
+                  <!-- <v-progress-circular v-if="searchLoading" size="24" color="info" indeterminate></v-progress-circular> -->
+                </v-scale-transition>
+                <!-- <v-progress-linear v-if="custom" slot="progress" :value="progress" :color="color" height="3"></v-progress-linear> -->
+                <v-progress-linear v-if="custom" slot="progress" height="3"></v-progress-linear>
+              </v-text-field>
+
+            </v-flex>
+          </v-layout>
+
+          <v-layout align-center justify-center>
+
             <v-flex xs10>
               <v-card>
                 <v-card-text>
                   <v-layout row wrap>
                     <v-flex xs12 md6>
                       <span>弹窗测试</span>
-                      
+
 
                     </v-flex>
                     <v-flex xs12 md6>
                       <span>主题</span>
-                      <v-switch v-model="dark" primary label="暗黑"></v-switch>
+                      <v-switch v-model="dark" primary label="暗黑" ></v-switch>
                     </v-flex>
                     <v-flex xs12 md6>
                       <span>Drawer</span>
@@ -93,14 +95,23 @@
           </v-layout>
         </v-container>
 
-
+        <div>
+          <div class="text-xs-center">
+            <v-btn color="primary" @click="alert = !alert">
+              Toggle
+            </v-btn>
+          </div>
+          <v-alert :value="alert" type="info" transition="scale-transition" dismissible>
+            This is a success alert.
+          </v-alert>
+        </div>
 
       </v-content>
-      
+
       <v-footer :inset="footer.inset" app>
-        
+
         <span class="px-3">&copy; {{ new Date().getFullYear() }}</span>
-     
+
       </v-footer>
     </v-app>
   </div>
