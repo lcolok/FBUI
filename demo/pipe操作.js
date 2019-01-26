@@ -1,36 +1,58 @@
 var request = require('request');
 var axios = require('axios');
+const Qs = require("qs");
 var fs = require('fs');
 
+const shimoCookie = "shimo_sid=s:UmcqxgbtanN5R-yaheURrLnKpXDD9xlg.jn9p7u5voFG4bsuGZkiBvbURLOACUeoRMrARh3+B5Qs;";
+
+const headers = {
+    "Accept": "*/*",
+    "Accept-Encoding": "br, gzip, deflate",
+    "Accept-Language": "zh-cn",
+    "Connection": "keep-alive",
+    "Referer": "https://shimo.im/docs/K8CWmBMqMtYYpU1f",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1.1 Safari/605.1.15",
+    "X-CSRF-Token": "JDvV3azC-fmyRaI4kR98csJiXEhmprm78WMw",
+    "Cookie": shimoCookie + "_csrf=q4MNRquXrxATGBLCwExHVcIs;"
+}
 
 async function getToken() {
     var resp = await getDiscussion('BIqrOzKiVEoPs8ke');
     return resp[0];
 }
 
-var shimoCookie = "shimo_sid=s:UmcqxgbtanN5R-yaheURrLnKpXDD9xlg.jn9p7u5voFG4bsuGZkiBvbURLOACUeoRMrARh3+B5Qs;";
+async function tryCatch(promise) {
+    try {
+        const ret = await promise
+        return [ret, null]
+    } catch (e) {
+        return [null, e]
+    }
+}
+
+
+function http(config) {
+    return tryCatch(
+        axios.create({
+            // timeout: 1500,
+            transformRequest: [data => Qs.stringify(data)]
+        })(config)
+    )
+}
+
 
 async function getDiscussion(fileID) {
     var content, list;
     var contentList = [];
-    var headers = {
-        "Accept": "*/*",
-        "Accept-Encoding": "br, gzip, deflate",
-        "Accept-Language": "zh-cn",
-        "Connection": "keep-alive",
-        "Referer": "https://shimo.im/docs/K8CWmBMqMtYYpU1f",
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1.1 Safari/605.1.15",
-        "X-CSRF-Token": "JDvV3azC-fmyRaI4kR98csJiXEhmprm78WMw",
-        "Cookie": shimoCookie + "_csrf=q4MNRquXrxATGBLCwExHVcIs;"
-    }
 
-    const [resp, error] = await axios({
+
+    const [resp, error] = await http({
         method: "get",
         url: `https://shimo.im/smapi/files/${fileID}/discussions?limit=99999999`,
         headers: headers,
     })
     if (error) {
-        return console.log("getDiscussion请求出错: " + err);
+        return console.log("getDiscussion请求出错: " + error);
     }
     // console.log("getDiscussion请求成功");
 
@@ -47,17 +69,33 @@ async function getDiscussion(fileID) {
     return contentList;
 }
 
-void (async () => {
+async function uploadShimo() {
     var token = await getToken();
-    console.log(token);
-    var resp = await request.post('https://uploader.shimo.im/upload2', {
-        form: {
-            'server': 'qiniu',
-            'type': 'attachments',
-            'accessToken': token,
-            'file': "hahhaah"
-        }
-    });
+    console.log("拿到石墨评论中的Token:  " + token);
 
-    console.log(resp);
-})
+    var data = fs.createReadStream('demo/demo.jpg');
+
+    const r = request.post({
+        url: 'https://uploader.shimo.im/upload2',
+        // header: headers,
+    }, function optionalCallback(err, httpResponse, body) {
+        console.log(body);
+    })
+    const form = r.form();
+    form.append('server', 'qiniu');
+    form.append('type', 'attachments');
+    form.append('accessToken', token);
+    // form.append('file', fs.createReadStream('demo/demo.jpg'), {filename: 'unicycle.jpg'});//这个可以强制改名字
+    form.append('file', data);
+}
+
+void (async () => {
+    // uploadShimo();
+
+    request
+        .get('https://uploader.shimo.im/f/nKwdkxfMaToDzQCG.jpg')
+        .on('error', function (err) {
+            console.log(err)
+        })
+        .pipe(fs.createWriteStream('doodle.png'))
+})();
