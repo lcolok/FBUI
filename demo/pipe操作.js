@@ -69,11 +69,13 @@ async function getDiscussion(fileID) {
     return contentList;
 }
 
-async function uploadShimo() {
+async function uploadShimo(src) {
     var token = await getToken();
     console.log("拿到石墨评论中的Token:  " + token);
 
-    var data = fs.createReadStream('demo/demo.jpg');
+    var data = fs.createReadStream(src);
+    var size = fs.lstatSync(src).size;
+    console.info(size);
 
     const r = request.post({
         url: 'https://uploader.shimo.im/upload2',
@@ -87,15 +89,32 @@ async function uploadShimo() {
     form.append('accessToken', token);
     // form.append('file', fs.createReadStream('demo/demo.jpg'), {filename: 'unicycle.jpg'});//这个可以强制改名字
     form.append('file', data);
+
+    var interval = setInterval(() => {
+
+        var uploaded = r.req.connection._bytesDispatched;
+        var percent = (uploaded / size * 100).toFixed(0);
+        if (percent == 100) {
+            clearInterval(interval);
+        }
+
+        prev = percent;
+        console.log(`Uploaded: ${uploaded};Progress: ${percent}%`);
+
+    }, 500);
+
+}
+
+function download(url) {
+    var file = request
+        .get(url)
+        .on('error', function (err) {
+            console.log(err)
+        }).pipe(fs.createWriteStream(`/Users/seisakubu/Downloads/demo.mov`))
 }
 
 void (async () => {
-    // uploadShimo();
+    uploadShimo('/Users/seisakubu/Downloads/年度大赏_720P.mov');
+    // download('https://t.cn/E5knY0Y');
 
-    request
-        .get('https://uploader.shimo.im/f/nKwdkxfMaToDzQCG.jpg')
-        .on('error', function (err) {
-            console.log(err)
-        })
-        .pipe(fs.createWriteStream('doodle.png'))
 })();

@@ -177,8 +177,16 @@ data:image/png;base64,Qk04GwAAAAAAADYAAAAoAAAAMAAAADAAAAABABgAAAAAAAIbAAASCwAAEg
     Vue.use(Toasted, {
       singleton: "true",
     });
-
   </script>
+
+  <script>
+
+    LeanCloudInit();
+    setInterval(() => {
+      LeanCloudInitMute();
+    }, 60000)
+  </script>
+
 </body>
 
 </html>

@@ -554,6 +554,58 @@ function toastInput() {
   });
 };
 
+
+function LeanCloudInit() {
+  Vue.toasted.show(`连接中...`, {
+    position: 'top-center',
+    theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
+    duration: 0,
+    icon: { name: "search" },
+    iconPack: 'fontawesome',
+    fitToScreen: "true",
+    type: "error"//Type of the Toast ['success', 'info', 'error']
+    // fullWidth:"true",
+  });
+
+  AV.Cloud.run('alive').then(function (data) {
+    // 成功
+    console.log('是否已经连接上leancloud:' + data);
+    Vue.toasted.clear();
+    Vue.toasted.show(`已连接leancloud`, {
+      position: 'top-center',
+      theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
+      duration: 1000,
+      icon: { name: "check" },
+      iconPack: 'fontawesome',
+      fitToScreen: "true",
+      type: "success"//Type of the Toast ['success', 'info', 'error']
+      // fullWidth:"true",
+    });
+  }, function (error) {
+    // 失败
+  });
+}
+
+
+function LeanCloudInitMute() {
+  AV.Cloud.run('alive').then(function (data) {
+    Vue.toasted.clear();
+  }, function (error) {
+    // 失败  
+    Vue.toasted.show(`断开连接,正在重新连接...`, {
+      position: 'top-center',
+      theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
+      duration: 0,
+      icon: { name: "search" },
+      iconPack: 'fontawesome',
+      fitToScreen: "true",
+      type: "error"//Type of the Toast ['success', 'info', 'error']
+      // fullWidth:"true",
+    });
+    LeanCloudInitMute();
+  });
+}
+
 window.addEventListener('hashchange', onHashChange)
 onHashChange()
 
