@@ -1,7 +1,7 @@
-AV.init({
-  appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
-  appKey: 'vLplaY3j4OYf3e6e603sb0JX',
-})
+// AV.init({
+//   appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
+//   appKey: 'vLplaY3j4OYf3e6e603sb0JX',
+// })
 
 
 
@@ -278,6 +278,7 @@ var app = new Vue({
       });
 
     }
+ 
     ,
     copy2Clipboard: async function (todo) {
       console.log(todo);
@@ -605,6 +606,9 @@ function LeanCloudInitMute() {
     LeanCloudInitMute();
   });
 }
+
+
+
 
 window.addEventListener('hashchange', onHashChange)
 onHashChange()

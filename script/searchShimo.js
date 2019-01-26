@@ -8,10 +8,10 @@ try {
 
 
 // 初始化存储 SDK
-AV.init({
-    appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
-    appKey: 'vLplaY3j4OYf3e6e603sb0JX',
-});
+// AV.init({
+//     appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
+//     appKey: 'vLplaY3j4OYf3e6e603sb0JX',
+// });
 
 
 var key = "SVIP";
@@ -99,7 +99,3 @@ function cutHTTP(input) {
     return input.replace(/[a-zA-z]+:\/\//g, '');
 }
 
-module.exports = {
-    search: searchLC,
-    makeAList:makeAList
-}
