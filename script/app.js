@@ -1,7 +1,11 @@
-// AV.init({
-//   appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
-//   appKey: 'vLplaY3j4OYf3e6e603sb0JX',
-// })
+try {
+  AV.init({
+    appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
+    appKey: 'vLplaY3j4OYf3e6e603sb0JX',
+  })
+} catch (e) {
+
+}
 
 
 
@@ -278,7 +282,7 @@ var app = new Vue({
       });
 
     }
- 
+
     ,
     copy2Clipboard: async function (todo) {
       console.log(todo);

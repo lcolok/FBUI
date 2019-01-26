@@ -2,16 +2,18 @@ try {
     var AV = require('leancloud-storage');
     var axios = require('axios');
     const Qs = require("qs");
+
+    // 初始化存储 SDK
+    AV.init({
+        appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
+        appKey: 'vLplaY3j4OYf3e6e603sb0JX',
+    });
+
 } catch (e) {
 
 }
 
 
-// 初始化存储 SDK
-// AV.init({
-//     appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
-//     appKey: 'vLplaY3j4OYf3e6e603sb0JX',
-// });
 
 
 var key = "SVIP";
@@ -35,7 +37,7 @@ async function searchLC(key) {
     return makeAList(resp);
 }
 
-function makeAList(resp){
+function makeAList(resp) {
     var result = [];
 
     resp.forEach(e => {
