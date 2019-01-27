@@ -613,16 +613,16 @@ function LeanCloudInitMute() {
 }
 
 function jump() {
-  var currentURL = window.location.href;
-  console.log(currentURL);
-  if (currentURL.match('lcolok.github.io/FBUI/')) {//如果是网页版的话
-    window.open('https://lcolok.github.io/FBUI/vuetify');
-  } else {//如果是本地打开的话
-    var url = window.location.href + 'vuetify/index.html';
+  // var currentURL = window.location.href;
+  // console.log(currentURL);
+  // if (currentURL.match('lcolok.github.io/FBUI/')) {//如果是网页版的话
+  //   window.open('https://lcolok.github.io/FBUI/vuetify');
+  // } else {//如果是本地打开的话
+  //   var url = window.location.href + 'vuetify/index.html';
  
-    window.open(url);
-  }
-
+  //   window.open(url);
+  // }
+  window.open(window.location.href+'vuetify/');
 }
 
 
