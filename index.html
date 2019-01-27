@@ -175,8 +175,8 @@ data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAQMklEQVR42u
         var styleArray = ['plastic', 'flat', 'flat-square', 'for-the-badge', 'popout', 'popout-square', 'social'];
         var style = styleArray[1];
         var shieldioURL = `https://img.shields.io/badge/-Vuetify计划-lightgrey.svg?style=${style}&colorA=${colorA}&colorB=${colorB}&logo=${logoBase64}`;
-        var openURL = 'https://lcolok.github.io/FBUI/vuetify';
-        document.write(` <img style="cursor:pointer" onclick="window.open('${openURL}')" src='${shieldioURL}'> `);
+
+        document.write(` <img style="cursor:pointer" onclick="jump()" src='${shieldioURL}'> `);
       </script>
     </p>
 

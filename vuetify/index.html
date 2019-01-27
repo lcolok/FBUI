@@ -38,7 +38,7 @@
 
               <v-text-field v-model="keyword" label="搜索" prepend-inner-icon="search" solo clearable autofocus
                 v-on:input="searchByKeyword(500)" @keydown.enter="searchByKeyword(0)" loading hint="随便搜点什么吧..."
-                :rules="[rules.required,rules.counter]">
+                :rules="[rules.required,rules.entropy]">
                 <v-scale-transition slot="append">
                   <!-- <v-progress-circular v-if="searchLoading" size="24" color="info" indeterminate></v-progress-circular> -->
                 </v-scale-transition>

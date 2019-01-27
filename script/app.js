@@ -124,6 +124,7 @@ var app = new Vue({
   // methods that implement data logic.
   // note there's no DOM manipulation here at all.
   methods: {
+
     fetchTodos: function (id) {
       const query = new AV.Query(Todo)
         .equalTo('user', AV.Object.createWithoutData('User', id))
@@ -611,7 +612,18 @@ function LeanCloudInitMute() {
   });
 }
 
+function jump() {
+  var currentURL = window.location.href;
+  console.log(currentURL);
+  if (currentURL.match('lcolok.github.io/FBUI/')) {//如果是网页版的话
+    window.open('https://lcolok.github.io/FBUI/vuetify');
+  } else {//如果是本地打开的话
+    var url = window.location.href + 'vuetify/index.html';
+ 
+    window.open(url);
+  }
 
+}
 
 
 window.addEventListener('hashchange', onHashChange)
