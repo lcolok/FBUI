@@ -574,7 +574,7 @@ function LeanCloudInit() {
 
   AV.Cloud.run('alive').then(function (data) {
     // 成功
-    console.log('是否已经连接上leancloud:' + data);
+    // console.log('是否已经连接上leancloud:' + data);
     Vue.toasted.clear();
     Vue.toasted.show(`已连接leancloud`, {
       position: 'top-center',

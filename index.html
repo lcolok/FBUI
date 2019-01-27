@@ -35,13 +35,13 @@
 </head>
 
 <body>
-    <script src="https://unpkg.com/leancloud-storage@^3.0.0-beta.3/dist/av-live-query-min.js"></script>
-    <script>
-      AV.init({
-        appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
-        appKey: 'vLplaY3j4OYf3e6e603sb0JX',
-      });
-    </script>
+  <script src="https://unpkg.com/leancloud-storage@^3.0.0-beta.3/dist/av-live-query-min.js"></script>
+  <script>
+    AV.init({
+      appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
+      appKey: 'vLplaY3j4OYf3e6e603sb0JX',
+    });
+  </script>
   <footer class="info">
     <!-- <script>
       var logoBase64 = `
@@ -180,8 +180,7 @@ data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAQMklEQVR42u
       </script>
     </p>
 
-
-    <p id='myAnchor'>
+    <p id='luckyName'>
       <script>
         var logoBase64 = `
             `;
@@ -190,15 +189,106 @@ data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAQMklEQVR42u
         var styleArray = ['plastic', 'flat', 'flat-square', 'for-the-badge', 'popout', 'popout-square', 'social'];
         var style = styleArray[1];
 
-        // var placeHolder = `https://img.shields.io/badge/🎲 手气如何-t.cn/xxxxxxx-lightgrey.svg?style=${style}&colorA=${colorA}&colorB=${colorB}&logo=${logoBase64}`;
-        // document.getElementById('myAnchor').innerHTML = ` <img style="cursor:pointer" src='${placeHolder}'> `;
-
         var shortURL = AV.Cloud.run('randomTCN').then(function (data) {
-          console.log(data)
+          // console.log(`新取得的短链:${data}`);
           var shieldioURL = `https://img.shields.io/badge/🎲 手气如何-${data}-lightgrey.svg?style=${style}&colorA=${colorA}&colorB=${colorB}&logo=${logoBase64}`;
           var openURL = 'https://lcolok.github.io/FBUI/vuetify';
-          document.getElementById('myAnchor').innerHTML = ` <img style="cursor:pointer" class='randomTCN' onclick="straightlyCopy('${data}')" src='${shieldioURL}'> `;
+          document.getElementById('luckyName').innerHTML = ` <img style="cursor:pointer" class='randomTCN' onclick="straightlyCopy('${data}')" src='${shieldioURL}'> `;
         });
+        function straightlyCopy(input) {
+          var clipboard = new ClipboardJS('.randomTCN', {
+            text: function (trigger) {
+              return input;
+            }
+          });
+        }
+      </script>
+    </p>
+
+    <p id='bestName'>
+      <script>
+        var shortURLArray = [];
+        var query = new AV.Query('randomTCN');
+        query.ascending('shannonEntropy');
+        query.limit(10);//请求数量上限为1000条
+        query.find().then(function (every) {
+
+
+          document.getElementById('bestName').innerHTML = makeBadge(every);
+
+        })
+
+        function suffix(num) {
+          switch (num) {
+            case '0':
+              return '🥇 1st';
+              break;
+            case '1':
+              return '🥈 2nd';
+              break;
+            case '2':
+              return '🥉 3rd';
+              break;
+            default:
+              return `${Number(num) + 1}th`;
+              break;
+          }
+        }
+
+        function makeBadge(every) {
+          var logoBase64 = `
+            `;
+          var prefixColor = 'dark';
+          var styleArray = ['plastic', 'flat', 'flat-square', 'for-the-badge', 'popout', 'popout-square', 'social'];
+          var style = styleArray[2];
+
+          var colorArray=gradientColors('#3dcb3c', '#dc6451', every.length);
+          console.log(colorArray);
+
+          var final = '';
+          var i = 1;
+
+          every.forEach(function (each) {
+            var shortURL = each.attributes.shortURL;
+            var shieldioURL = `https://img.shields.io/badge/${i}-${shortURL}-lightgrey.svg?style=${style}&colorA=${prefixColor}&colorB=${colorArray[i-1]}&logo=${logoBase64}`;
+            var line = ` <p><img style="cursor:pointer" class='randomTCN' onclick="straightlyCopy('${shortURL}')" src='${shieldioURL}'></p>`;
+            final += line;
+            i++;
+          })
+
+          return final;
+        }
+
+
+
+        function parseColor(hexStr) {
+          return hexStr.length === 4 ? hexStr.substr(1).split('').map(function (s) { return 0x11 * parseInt(s, 16); }) : [hexStr.substr(1, 2), hexStr.substr(3, 2), hexStr.substr(5, 2)].map(function (s) { return parseInt(s, 16); })
+        };
+
+        // zero-pad 1 digit to 2
+        function pad(s) {
+          return (s.length === 1) ? '0' + s : s;
+        };
+
+        function gradientColors(start, end, steps, gamma) {
+          var i, j, ms, me, output = [], so = [];
+          gamma = gamma || 1;
+          var normalize = function (channel) {
+            return Math.pow(channel / 255, gamma);
+          };
+          start = parseColor(start).map(normalize);
+          end = parseColor(end).map(normalize);
+          for (i = 0; i < steps; i++) {
+            ms = i / (steps - 1);
+            me = 1 - ms;
+            for (j = 0; j < 3; j++) {
+              so[j] = pad(Math.round(Math.pow(start[j] * me + end[j] * ms, 1 / gamma) * 255).toString(16));
+            }
+            output.push(so.join(''));
+          }
+          return output;
+        };
+
 
 
         function straightlyCopy(input) {
@@ -209,8 +299,9 @@ data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAQMklEQVR42u
           });
         }
       </script>
-
     </p>
+
+
 
   </footer>
   <!-- <a href="https://github.com/leancloud/leantodo-vue"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67"

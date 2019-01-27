@@ -16,15 +16,15 @@ try {
 
 
 
-var key = "SVIP";
+// var key = "SVIP";
 
 
 
-void (async () => {
-    var result = await searchLC(key);
-    console.log("找到了 " + result.length + " 个文件.");
-    console.log(result);
-})();
+// void (async () => {
+//     var result = await searchLC(key);
+//     console.log("找到了 " + result.length + " 个文件.");
+//     console.log(result);
+// })();
 
 
 
