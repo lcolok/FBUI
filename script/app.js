@@ -576,10 +576,10 @@ function LeanCloudInit() {
     // 成功
     // console.log('是否已经连接上leancloud:' + data);
     Vue.toasted.clear();
-    Vue.toasted.show(`已连接leancloud`, {
+    Vue.toasted.show(`已连接LeanCloud`, {
       position: 'top-center',
       theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
-      duration: 1000,
+      duration: 3000,
       icon: { name: "check" },
       iconPack: 'fontawesome',
       fitToScreen: "true",

@@ -218,19 +218,19 @@ data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAQMklEQVR42u
 
         })
 
-        function suffix(num) {
-          switch (num) {
-            case '0':
+        function suffix(i) {
+          switch (i) {
+            case 0:
               return '🥇 1st';
               break;
-            case '1':
+            case 1:
               return '🥈 2nd';
               break;
-            case '2':
+            case 2:
               return '🥉 3rd';
               break;
             default:
-              return `${Number(num) + 1}th`;
+              return `${Number(i) + 1}th`;
               break;
           }
         }
@@ -238,19 +238,20 @@ data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAQMklEQVR42u
         function makeBadge(every) {
           var logoBase64 = `
             `;
-          var prefixColor = 'dark';
+          var prefixColor = '';
           var styleArray = ['plastic', 'flat', 'flat-square', 'for-the-badge', 'popout', 'popout-square', 'social'];
-          var style = styleArray[2];
+          var style = styleArray[1];
 
-          var colorArray=gradientColors('#3dcb3c', '#dc6451', every.length);
+          var colorArray = gradientColors('#3dcb3c', '#dc6451', every.length);
           console.log(colorArray);
 
           var final = '';
-          var i = 1;
+          var i = 0;
 
           every.forEach(function (each) {
             var shortURL = each.attributes.shortURL;
-            var shieldioURL = `https://img.shields.io/badge/${i}-${shortURL}-lightgrey.svg?style=${style}&colorA=${prefixColor}&colorB=${colorArray[i-1]}&logo=${logoBase64}`;
+            console.log(`${shortURL}的信息熵:${each.attributes.shannonEntropy}`);
+            var shieldioURL = `https://img.shields.io/badge/${suffix(i)}-${shortURL}-lightgrey.svg?style=${style}&colorA=${prefixColor}&colorB=${colorArray[i]}&logo=${logoBase64}`;
             var line = ` <p><img style="cursor:pointer" class='randomTCN' onclick="straightlyCopy('${shortURL}')" src='${shieldioURL}'></p>`;
             final += line;
             i++;
@@ -296,6 +297,27 @@ data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAQMklEQVR42u
             text: function (trigger) {
               return input;
             }
+          });
+
+          clipboard.on('success', function (e) {
+            console.log(e);
+
+            Vue.toasted.success(`已复制 ${input}`, {
+              position: 'top-center',
+              theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
+              duration: 1000,
+              iconPack: 'fontawesome',
+              icon: { name: "copy" },
+              fitToScreen: "true",
+              type: "success",//Type of the Toast ['success', 'info', 'error']
+              singleton: "true",
+              // fullWidth:"true",
+            });
+            clipboard.destroy();
+          });
+
+          clipboard.on('error', function (e) {
+            console.log(e);
           });
         }
       </script>
