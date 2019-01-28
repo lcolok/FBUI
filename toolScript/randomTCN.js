@@ -1,3 +1,4 @@
+"use strict";
 try {
     var axios = require('axios');
     var AV = require('leancloud-storage');
@@ -9,6 +10,8 @@ try {
 
 }
 
+var LCOscore = 0;
+var combinationCount = 0;
 
 function cutHTTP(input) {
     return input.replace(/[a-zA-z]+:\/\//g, '');
@@ -26,7 +29,7 @@ async function shortenURL(input) {
 
     var longURL = input.match(/[a-zA-z]+:\/\/[^\s]*/g);
 
-    for (i = 0; i < longURL.length; i++) {
+    for (var i = 0; i < longURL.length; i++) {
         var url = 'http://api.weibo.com/2/short_url/shorten.json?source=2849184197&url_long=' + encodeURIComponent(longURL[i]);
         var response = await axios.get(url);
         var json = response.data;
@@ -43,17 +46,21 @@ async function getShortURL() {
     var newURL = origURL + '?r=' + num;
     var shortURL = await shortenURL(newURL);
     var cutShortURL = cutHTTP(shortURL);
-    console.log(cutShortURL);
-    //计算t.cn编码的香农信息熵
+    // console.log(cutShortURL);
     var suffix = cutShortURL.split('/').pop();
+    //计算t.cn编码的香农信息熵
     var shannonEntropy = entropy(suffix);
+    console.log(`"${suffix}"的香农信息熵:${shannonEntropy}`)
+    //计算t.cn编码的LCO信息熵
+    var newSE = newEntropy(suffix);
+    console.log(`"${suffix}"的LCO信息熵:${newSE}`)
     //上传到LC 
     var randomTCN = AV.Object.extend('randomTCN');
     var file = new randomTCN();
     file.set('shortURL', cutShortURL);
     file.set('shannonEntropy', shannonEntropy);
     file.save().then(function () {
-        console.log("已上传到LeanCloud");
+        console.log("香农信息熵已上传到LeanCloud");
     }, function (error) {
         console.log(JSON.stringify(error));
     });
@@ -78,9 +85,154 @@ function entropy(s) {
         var p = f / len;
         sum -= p * Math.log(p) / Math.log(2);
     });
-    console.log(`"${s}"的香农信息熵:${sum}`)
     return sum;
 };
+
+
+function continuity(s) {
+    var sc = 0, arr = s.split(''), len = s.length;
+
+    for (var i = 0; i < len; i++) {
+        for (var j = 1; j < len - i; j++) {
+            if (arr[i] == arr[i + j]) {
+                sc = sc + j;
+            } else { break; }
+        }
+    }
+    return sc / len
+}
+
+
+
+async function meaning(s) {
+
+    var arr = s.split(''), len = s.length;
+    //列举出全部组合
+    for (var i = 0; i < len; i++) {
+        var letter = arr[i];
+        for (var j = 1; j < len - i; j++) {
+            letter = letter + arr[i + j];
+            combinationCount++;
+            //检查大小写
+            await caseCheck(letter);
+        }
+    }
+    console.log(`总组合数:${combinationCount}`);
+    console.log(`得分为:${LCOscore}`);
+
+    return LCOscore;
+}
+
+async function caseCheck(s) {
+    if (s.match(/[^a-zA-Z]/)) {
+        // console.log('包含非字母'); 
+        return
+    };
+    var arr = s.split('');
+    if (/[A-Z]/.test(arr[0])) {//首字母是大写
+        if (s == s.toUpperCase()) {
+            // console.log('全大写');
+
+            await youdaoDic(s);
+            return
+        }
+        if (s == arr.shift() + arr.join('').toLowerCase()) {
+            // console.log('首字母大写');
+
+            await youdaoDic(s);
+            return
+        } else {
+            // console.log('参差');
+            return
+        }
+    } else {//首字母是小写
+        if (s == s.toLowerCase()) {
+            // console.log('全小写');
+
+            await youdaoDic(s);
+            return
+        }
+    }
+}
+
+function isSameCase(a, b) {
+    var boo1 = /[A-Z]/.test(a);
+    var boo2 = /[A-Z]/.test(b);
+    return boo1 == boo2 ? true : false;
+}
+
+function newEntropy(s) {
+    var sum_1 = 0, len = s.length;
+    process(s, function (k, f) {
+        var p = f / len;
+        sum_1 -= p * Math.log(p) / Math.log(2);
+    });
+
+    var sum_2 = continuity(s);
+
+    var sum_3 = meaning(s);
+
+    var sum = sum_1 - sum_2 * 2 - sum_3;
+
+    return sum;
+};
+
+
+async function youdaoDic(word) {
+
+    try {
+        var resp = await axios({
+            method: 'GET',
+            url: "http://dict.youdao.com/jsonapi",
+            params: { q: word , dicts: { "count": 2, "dicts": [["ec"],["ugc"]] } },
+        });
+        var data = resp.data;
+        var trArr = [];
+        if (data.ugc) {
+/*             data.ec.word[0].trs.forEach(e => {
+                trArr.push(e.tr[0].l.i);
+            })
+            console.log(`👍"${word}"👍 有意义:\n${trArr.join('\n')}`);
+            return true; */
+            console.log(`👍"${word}"👍 有意义:\n${data.ugc.data.content}`);
+            LCOscore++;
+        } else {
+            // console.log(data.result.msg);
+            return false;
+        }
+        // if (data.result.code == 200) {
+        //     console.log(`👍"${word}"👍 有意义:${data.data.entries[0].explain}`)
+        //     return true;
+        // } else {
+        //     // console.log(data.result.msg);
+        //     return false;
+        // }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+
+/* async function youdaoDicSuggest(word) {
+
+    try {
+        var resp = await axios({
+            method: 'GET',
+            url: "http://dict.youdao.com/suggest",
+            params: { q: word, le: 'auto', doctype: 'json' },
+        });
+        var data = resp.data;
+        if (data.result.code == 200) {
+            console.log(`👍"${word}"👍 有意义:${data.data.entries[0].explain}`)
+            return true;
+        } else {
+            // console.log(data.result.msg);
+            return false;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+} */
 
 
 function check() {
@@ -119,7 +271,11 @@ function check() {
 void (async () => {
 
     getShortURL();
-    check();
+    // caseCheck('HELLO');
+    // listAllWords('Et5ttCC');
+
+    // check();
+    // youdaoDic('function');
 })();
 
 // return getShortURL();

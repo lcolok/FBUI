@@ -622,7 +622,9 @@ function jump() {
  
   //   window.open(url);
   // }
-  window.open(window.location.href+'vuetify/');
+  var currentURL = window.location.href;
+  var domain = currentURL.split('/').shift();
+  window.open(domain+'/vuetify/');
 }
 
 

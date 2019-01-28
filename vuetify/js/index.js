@@ -30,8 +30,8 @@ new Vue({
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         return pattern.test(value) || 'Invalid e-mail.'
       },
-      entropy: value => {
-        var shannonEntropy = entropy(value).toString();
+      entropy: (value) => {
+        var shannonEntropy = newEntropy(value).toString();
         console.log(shannonEntropy);
         return `信息熵:${shannonEntropy}`
       }
@@ -86,6 +86,7 @@ function searchLC(target, delay) {
     target.keywordLasttime = key;
     window.location.href = `#/${key}`
     console.log('关键词为:' + key);
+    bingDic(key);
   }, delay)
 }
 
@@ -108,6 +109,19 @@ function process(s, evaluator) {
   return h;
 };
 
+function continuity(s) {
+  var sc = 0, arr = s.split(''), len = s.length;
+
+  for (var i = 0; i < len; i++) {
+    for (var j = 1; j < len - i; j++) {
+      if (arr[i] == arr[i + j]) {
+        sc = sc + j;
+      } else { break; }
+    }
+  }
+  return sc / len
+}
+
 function entropy(s) {
   var sum = 0, len = s.length;
   process(s, function (k, f) {
@@ -116,3 +130,42 @@ function entropy(s) {
   });
   return sum;
 };
+
+
+function newEntropy(s) {
+  var sum_1 = 0, len = s.length;
+  process(s, function (k, f) {
+    var p = f / len;
+    sum_1 -= p * Math.log(p) / Math.log(2);
+  });
+
+  var sum_2 = continuity(s);
+
+  var sum = sum_1 - sum_2 * 2;
+
+  return sum;
+};
+
+
+async function bingDic(word) {
+
+  try {
+    var resp = await axios({
+      method: 'GET',
+      url: "http://xtk.azurewebsites.net/BingDictService.aspx",
+      params: { Word: word, Samples: false },
+    });
+    if (resp.defs != null) {
+      var arr;
+      resp.defs.forEach(e => {
+        arr.push(e.def)
+      })
+      console.log(arr.join(''));
+      return arr.join('')
+    }
+  } catch (e) {
+    console.log(e);
+  }
+
+
+}
