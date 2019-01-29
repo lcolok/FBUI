@@ -184,16 +184,16 @@ async function youdaoDic(word) {
         var resp = await axios({
             method: 'GET',
             url: "http://dict.youdao.com/jsonapi",
-            params: { q: word , dicts: { "count": 2, "dicts": [["ec"],["ugc"]] } },
+            params: { q: word, dicts: { "count": 2, "dicts": [["ec"], ["ugc"]] } },
         });
         var data = resp.data;
         var trArr = [];
         if (data.ugc) {
-/*             data.ec.word[0].trs.forEach(e => {
-                trArr.push(e.tr[0].l.i);
-            })
-            console.log(`👍"${word}"👍 有意义:\n${trArr.join('\n')}`);
-            return true; */
+            /*             data.ec.word[0].trs.forEach(e => {
+                            trArr.push(e.tr[0].l.i);
+                        })
+                        console.log(`👍"${word}"👍 有意义:\n${trArr.join('\n')}`);
+                        return true; */
             console.log(`👍"${word}"👍 有意义:\n${data.ugc.data.content}`);
             LCOscore++;
         } else {
@@ -268,10 +268,30 @@ function check() {
 
 };
 
+function newSearch() {
+    var query = new AV.Query('ShimoBed');
+    query.contains("name", "北").contains("name", "京").contains("name", "提问0114").find().then(e => {
+        e.forEach(e => {
 
+            var name = e.attributes.name;
+            console.log(name);
+        });
+
+    });
+
+/*     var query = new AV.Query('randomTCN');
+    query.contains("shortURL", "Ety").contains("shortURL", "diyf").limit(1000).find().then(e => {
+        e.forEach(e => {
+
+            var name = e.attributes.shortURL;
+            console.log(name);
+        })
+
+    }); */
+}
 
 void (async () => {
-
+    newSearch()
     // getShortURL();
     // caseCheck('HELLO');
     // listAllWords('Et5ttCC');
