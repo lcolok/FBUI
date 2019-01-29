@@ -266,11 +266,13 @@ function check() {
         // 异常处理
     });
 
-}
+};
+
+
 
 void (async () => {
 
-    getShortURL();
+    // getShortURL();
     // caseCheck('HELLO');
     // listAllWords('Et5ttCC');
 
