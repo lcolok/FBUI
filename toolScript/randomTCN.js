@@ -290,8 +290,16 @@ function newSearch() {
     }); */
 }
 
+function getRandomStr(len) {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for( var i=0; i < len; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+}
+
 void (async () => {
-    newSearch()
+    console.log(getRandomStr(6));
     // getShortURL();
     // caseCheck('HELLO');
     // listAllWords('Et5ttCC');
