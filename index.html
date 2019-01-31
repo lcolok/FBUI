@@ -2,6 +2,20 @@
 <html data-framework="vue">
 
 <head>
+  <script>
+    function getUrlVars() {
+      var vars = {};
+      var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
+        vars[key] = value;
+      });
+      return vars;
+    }
+    var r = getUrlVars()['r'];
+    if(r=='598251'){
+      window.location.href='http://www.baidu.com';
+    }
+  </script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
   <meta name="referrer" content="never" />
   <meta name="referrer" content="no-referrer" />
