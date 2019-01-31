@@ -2,6 +2,13 @@
 <html data-framework="vue">
 
 <head>
+  <script src="https://unpkg.com/leancloud-storage@^3.0.0-beta.3/dist/av-live-query-min.js"></script>
+  <script>
+    AV.init({
+      appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
+      appKey: 'vLplaY3j4OYf3e6e603sb0JX',
+    });
+  </script>
   <script>
     function getUrlVars() {
       var vars = {};
@@ -11,8 +18,15 @@
       return vars;
     }
     var r = getUrlVars()['r'];
-    if(r=='598251'){
-      window.location.href='http://www.baidu.com';
+    console.log(r);
+    if (r) {
+      var query = new AV.Query('randomTCN');
+      query.equalTo('r', r).find().then(e => {
+        if (e.length != 0) {
+          if (e.length > 1) {alert(`该r出现了${e.length}次,如果出现无法重定向,请删除重复项`)};
+          window.location.href = e[0].attributes.redirectURL;
+        }
+      });
     }
   </script>
 
@@ -49,13 +63,7 @@
 </head>
 
 <body>
-  <script src="https://unpkg.com/leancloud-storage@^3.0.0-beta.3/dist/av-live-query-min.js"></script>
-  <script>
-    AV.init({
-      appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
-      appKey: 'vLplaY3j4OYf3e6e603sb0JX',
-    });
-  </script>
+
   <footer class="info">
     <!-- <script>
       var logoBase64 = `

@@ -41,26 +41,27 @@ async function shortenURL(input) {
 }
 
 async function getShortURL() {
-    var num = randomNum();
+    var r = await getRandomStr(6);//生成随机六位不重复的string
     const origURL = 'https://lcolok.github.io/FBUI/';
-    var newURL = origURL + '?r=' + num;
+    var newURL = origURL + '?r=' + r;
     var shortURL = await shortenURL(newURL);
     var cutShortURL = cutHTTP(shortURL);
     // console.log(cutShortURL);
     var suffix = cutShortURL.split('/').pop();
     //计算t.cn编码的香农信息熵
     var shannonEntropy = entropy(suffix);
-    console.log(`"${suffix}"的香农信息熵:${shannonEntropy}`)
+    console.log(`"${suffix}"的香农信息熵:${shannonEntropy}`);
     //计算t.cn编码的LCO信息熵
     var newSE = newEntropy(suffix);
-    console.log(`"${suffix}"的LCO信息熵:${newSE}`)
+    console.log(`"${suffix}"的LCO信息熵:${newSE}`);
     //上传到LC 
     var randomTCN = AV.Object.extend('randomTCN');
     var file = new randomTCN();
+    file.set('r', r);
     file.set('shortURL', cutShortURL);
     file.set('shannonEntropy', shannonEntropy);
     file.save().then(function () {
-        console.log("香农信息熵已上传到LeanCloud");
+        console.log(`r:${r},短链:${cutShortURL},香农信息熵:${shannonEntropy} 已上传到LeanCloud`);
     }, function (error) {
         console.log(JSON.stringify(error));
     });
@@ -279,28 +280,43 @@ function newSearch() {
 
     });
 
-/*     var query = new AV.Query('randomTCN');
-    query.contains("shortURL", "Ety").contains("shortURL", "diyf").limit(1000).find().then(e => {
-        e.forEach(e => {
-
-            var name = e.attributes.shortURL;
-            console.log(name);
-        })
-
-    }); */
+    /*     var query = new AV.Query('randomTCN');
+        query.contains("shortURL", "Ety").contains("shortURL", "diyf").limit(1000).find().then(e => {
+            e.forEach(e => {
+    
+                var name = e.attributes.shortURL;
+                console.log(name);
+            })
+    
+        }); */
 }
 
 function getRandomStr(len) {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for( var i=0; i < len; i++ )
+    for (var i = 0; i < len; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+
+    var query = new AV.Query('randomTCN');//验证随机生成出来的这个六位数是否与leancloud上的r有重复
+    query.equalTo("r", text).find().then(e => {
+        if(e.length>0){
+            e.forEach(e => {
+                var r = e.attributes.r;
+                console.log(`已经存在相同的随机数:${r},准备重新生成`);
+                text = getRandomStr(len);
+            });
+        }
+
+
+    });
+
     return text;
 }
 
 void (async () => {
-    console.log(getRandomStr(6));
-    // getShortURL();
+    // console.log(getRandomStr(6));
+    getShortURL();
     // caseCheck('HELLO');
     // listAllWords('Et5ttCC');
 
