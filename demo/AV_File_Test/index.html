@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<input type="file" id="photoFileUpload" />
+<input type="button" onclick="upload()" value="上传" />
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="https://unpkg.com/leancloud-storage@^3.0.0-beta.3/dist/av-live-query-min.js"></script>
+<script>
+    AV.init({
+        appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
+        appKey: 'vLplaY3j4OYf3e6e603sb0JX',
+    });
+
+    function upload() {
+        var fileUploadControl = $('#photoFileUpload')[0];
+        if (fileUploadControl.files.length > 0) {
+            var localFile = fileUploadControl.files[0];
+            var name = getFileName(fileUploadControl);
+
+            var file = new AV.File(name, localFile);
+            file.save().then(function (file) {
+                // 文件保存成功
+                console.log(file.url());
+            }, function (error) {
+                // 异常处理
+                console.error(error);
+            });
+        }
+    }
+
+
+    function getFileName(obj) {
+        var fileName = "";
+
+        if (typeof (fileName) != "undefined") {
+            fileName = $(obj).val().split("\\").pop();
+            fileName = fileName.substring(0, fileName.lastIndexOf("."));
+        }
+        return fileName;
+    }
+</script>

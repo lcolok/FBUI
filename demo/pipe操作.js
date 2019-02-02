@@ -89,17 +89,22 @@ async function uploadShimo(src) {
     form.append('accessToken', token);
     // form.append('file', fs.createReadStream('demo/demo.jpg'), {filename: 'unicycle.jpg'});//这个可以强制改名字
     form.append('file', data);
-
+    
+    var start = new Date();
     var interval = setInterval(() => {
 
         var uploaded = r.req.connection._bytesDispatched;
+        var mb = uploaded/(1024*1024);
         var percent = (uploaded / size * 100).toFixed(0);
         if (percent == 100) {
             clearInterval(interval);
         }
 
         prev = percent;
-        console.log(`Uploaded: ${uploaded};Progress: ${percent}%`);
+        var end = new Date();
+        var duration = (end-start)/1000;
+        var speed = mb/duration;
+        console.log(`Uploaded: ${mb.toFixed(2)} MB; Progress: ${percent}%; Upload_Speed: ${speed.toFixed(2)} MB/s`);
 
     }, 500);
 
@@ -114,7 +119,7 @@ function download(url) {
 }
 
 void (async () => {
-    uploadShimo('/Users/seisakubu/Downloads/年度大赏_720P.mov');
+    uploadShimo('demo/カサネテク- 女孩聯誼必勝招式歌曲 (完美版中文字幕)Full Ver..mp4');
     // download('https://t.cn/E5knY0Y');
 
 })();
