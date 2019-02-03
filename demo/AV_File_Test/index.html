@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<input type="file" id="photoFileUpload" />
+<input type="file" id="photoFileUpload" change="getFileName()" />
 <input type="button" onclick="upload()" value="上传" />
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="https://unpkg.com/leancloud-storage@^3.0.0-beta.3/dist/av-live-query-min.js"></script>
@@ -9,6 +9,7 @@
         appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
         appKey: 'vLplaY3j4OYf3e6e603sb0JX',
     });
+
 
     function upload() {
         var fileUploadControl = $('#photoFileUpload')[0];
@@ -29,12 +30,14 @@
 
 
     function getFileName(obj) {
-        var fileName = "";
 
-        if (typeof (fileName) != "undefined") {
-            fileName = $(obj).val().split("\\").pop();
-            fileName = fileName.substring(0, fileName.lastIndexOf("."));
+        if (typeof (obj) == "undefined") {
+            var obj = $('#photoFileUpload')[0];
         }
+
+        console.log($(obj).val().split("\\"));
+        fileName = $(obj).val().split("\\").pop();
+        fileName = fileName.substring(0, fileName.lastIndexOf(".")); 
         return fileName;
     }
 </script>
