@@ -1,0 +1,371 @@
+HTTP客户端是很多时候我们都需要用到的功能，今天就来介绍一个比较流行的JavaScript编写的HTTP客户端库[axios](https://link.jianshu.com/?t=https://github.com/mzabriskie/axios)。
+
+安装
+--
+
+如果你会使用npm的话，可以使用npm来装，非常方便。
+
+    $ npm install axios
+    
+
+如果你准备在浏览器中尝试使用，可以直接使用CDN。
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    
+
+快速上手
+----
+
+在使用axios之前，先来介绍一下ES6标准中引入的Promise对象，它是为了方便异步编程而设立的。如果希望详细了解Promise对象的用法，可以查看[这里](https://link.jianshu.com/?t=http://es6.ruanyifeng.com/#docs/promise)。Promise对象含有`then`和`catch`方法，分别用来处理异步操作和抛出异常操作。所以如果一个方法返回Promise对象，我们就可以简单的像这样编写异步操作。
+
+    funtionReturnPromise(XXX)
+        .then(function (returnValue) {
+        //异步操作
+        })
+        .catch(function (error) {
+        //异常处理
+        })
+    
+
+[HTTPBIN](https://link.jianshu.com/?t=http://httpbin.org/)这个网站可以帮助我们测试HTTP请求， 所以这里使用它作为目标网站。
+
+### GET请求
+
+    axios.get('http://httpbin.org/get?fuck=shit')
+        .then(function (response) {
+            console.log(response.data)
+        })
+        .catch(function (error) {
+            console.log(error)
+        })
+    
+    
+
+当然请求参数也可以单独传进去。
+
+    axios.get('http://httpbin.org/get', {
+        params: {
+            fuck: "shit"
+        }
+    })
+        .then(function (response) {
+            console.log(response.data)
+        })
+        .catch(function (error) {
+            console.log(error)
+        })
+    
+
+### POST请求
+
+POST请求的参数只能以参数的形式传入。
+
+    axios.post('http://httpbin.org/post', {
+        fuck: 'shit',
+        son: 'bitch'
+    })
+        .then(function (response) {
+            console.log(response.data)
+        })
+        .catch(function (error) {
+            console.log(error)
+        })
+    
+
+API介绍
+-----
+
+### 使用配置发送请求
+
+除了前面显式使用对应方法来发起请求，我们还可以使用配置来设置如何发送请求。例如，要发送一个POST请求，可以这么写。
+
+    axios({
+      method: 'post',
+      url: '/user/12345',
+      data: {
+        firstName: 'Fred',
+        lastName: 'Flintstone'
+      }
+    });
+    
+
+### 所有请求方法
+
+axios可以发送不同类型的HTTP请求，这些请求方法可以参考下面。
+
+    axios.request(config)
+    
+    axios.get(url[, config])
+    
+    axios.delete(url[, config])
+    
+    axios.head(url[, config])
+    
+    axios.options(url[, config])
+    
+    axios.post(url[, data[, config]])
+    
+    axios.put(url[, data[, config]])
+    
+    axios.patch(url[, data[, config]])
+    
+
+### 创建实例
+
+有时候需要多次发起同一类型的请求，这时候可以创建请求实例。创建实例使用`axios.create([config])`方法。下面创建了一个实例，然后用该实例发起请求。
+
+    let instance = axios.create({
+        baseURL: 'https://httpbin.org/',
+        timeout: 4000
+    })
+    instance.get('ip')
+        .then(function (response) {
+            console.log(response.data)
+        })
+        .catch(function (error) {
+            console.log(error)
+        })
+    
+
+实例上还有其他方法，基本和axios全局对象上的方法类似。
+
+### 请求配置
+
+前面很多地方已经使用了配置对象。下面来详细介绍一下该对象。
+
+    {
+      // 请求地址
+      url: '/user',
+    
+      // 请求方法类型
+      method: 'get', // default
+    
+      // 基地址会和URL组合在一起，除非URL是绝对地址
+      // It can be convenient to set `baseURL` for an instance of axios to pass relative URLs
+      // to methods of that instance.
+      baseURL: 'https://some-domain.com/api/',
+    
+      // 该方法可以按照自己的需求将响应转换成需要的格式
+      // This is only applicable for request methods 'PUT', 'POST', and 'PATCH'
+      // The last function in the array must return a string or an instance of Buffer, ArrayBuffer,
+      // FormData or Stream
+      // You may modify the headers object.
+      transformRequest: [function (data, headers) {
+        // Do whatever you want to transform the data
+    
+        return data;
+      }],
+    
+      // `transformResponse` allows changes to the response data to be made before
+      // it is passed to then/catch
+      transformResponse: [function (data) {
+        // Do whatever you want to transform the data
+    
+        return data;
+      }],
+    
+      // http头
+      headers: {'X-Requested-With': 'XMLHttpRequest'},
+    
+      // 请求参数，会添加到URL上
+      // Must be a plain object or a URLSearchParams object
+      params: {
+        ID: 12345
+      },
+    
+      // `paramsSerializer` 可以按照需要序列化参数
+      // (e.g. https://www.npmjs.com/package/qs, http://api.jquery.com/jquery.param/)
+      paramsSerializer: function(params) {
+        return Qs.stringify(params, {arrayFormat: 'brackets'})
+      },
+    
+      // `data` 参数会以请求体的形式进行发送
+      // Only applicable for request methods 'PUT', 'POST', and 'PATCH'
+      // When no `transformRequest` is set, must be of one of the following types:
+      // - string, plain object, ArrayBuffer, ArrayBufferView, URLSearchParams
+      // - Browser only: FormData, File, Blob
+      // - Node only: Stream, Buffer
+      data: {
+        firstName: 'Fred'
+      },
+    
+      // `timeout` 指定超时毫秒数
+      // If the request takes longer than `timeout`, the request will be aborted.
+      timeout: 1000,
+    
+      // `withCredentials` indicates whether or not cross-site Access-Control requests
+      // should be made using credentials
+      withCredentials: false, // default
+    
+      // `adapter` allows custom handling of requests which makes testing easier.
+      // Return a promise and supply a valid response (see lib/adapters/README.md).
+      adapter: function (config) {
+        /* ... */
+      },
+    
+      // `auth` indicates that HTTP Basic auth should be used, and supplies credentials.
+      // This will set an `Authorization` header, overwriting any existing
+      // `Authorization` custom headers you have set using `headers`.
+      auth: {
+        username: 'janedoe',
+        password: 's00pers3cret'
+      },
+    
+      // `responseType` indicates the type of data that the server will respond with
+      // options are 'arraybuffer', 'blob', 'document', 'json', 'text', 'stream'
+      responseType: 'json', // default
+    
+      // `xsrfCookieName` is the name of the cookie to use as a value for xsrf token
+      xsrfCookieName: 'XSRF-TOKEN', // default
+    
+      // `xsrfHeaderName` is the name of the http header that carries the xsrf token value
+      xsrfHeaderName: 'X-XSRF-TOKEN', // default
+    
+      // `onUploadProgress` allows handling of progress events for uploads
+      onUploadProgress: function (progressEvent) {
+        // Do whatever you want with the native progress event
+      },
+    
+      // `onDownloadProgress` allows handling of progress events for downloads
+      onDownloadProgress: function (progressEvent) {
+        // Do whatever you want with the native progress event
+      },
+    
+      // `maxContentLength` defines the max size of the http response content allowed
+      maxContentLength: 2000,
+    
+      // `validateStatus` defines whether to resolve or reject the promise for a given
+      // HTTP response status code. If `validateStatus` returns `true` (or is set to `null`
+      // or `undefined`), the promise will be resolved; otherwise, the promise will be
+      // rejected.
+      validateStatus: function (status) {
+        return status >= 200 && status < 300; // default
+      },
+    
+      // `maxRedirects` defines the maximum number of redirects to follow in node.js.
+      // If set to 0, no redirects will be followed.
+      maxRedirects: 5, // default
+    
+      // `httpAgent` and `httpsAgent` define a custom agent to be used when performing http
+      // and https requests, respectively, in node.js. This allows options to be added like
+      // `keepAlive` that are not enabled by default.
+      httpAgent: new http.Agent({ keepAlive: true }),
+      httpsAgent: new https.Agent({ keepAlive: true }),
+    
+      // 'proxy' 指定请求使用的网络代理
+      // Use `false` to disable proxies, ignoring environment variables.
+      // `auth` indicates that HTTP Basic auth should be used to connect to the proxy, and
+      // supplies credentials.
+      // This will set an `Proxy-Authorization` header, overwriting any existing
+      // `Proxy-Authorization` custom headers you have set using `headers`.
+      proxy: {
+        host: '127.0.0.1',
+        port: 9000,
+        auth: {
+          username: 'mikeymike',
+          password: 'rapunz3l'
+        }
+      },
+    
+      // `cancelToken` 指定取消token，这个token可以用来取消请求
+      // (see Cancellation section below for details)
+      cancelToken: new CancelToken(function (cancel) {
+      })
+    }
+    
+
+### 响应对象
+
+然后来介绍一下响应对象，也就是前面那些方法返回的response。
+
+    {
+      // `data` 请求返回的数据（HTML、JSON等）
+      data: {},
+    
+      // `status` 状态码
+      status: 200,
+    
+      // `statusText` 状态文本
+      statusText: 'OK',
+    
+      // `headers` 响应头
+      // All header names are lower cased
+      headers: {},
+    
+      // `config` axios请求使用的配置
+      config: {},
+    
+      // `request` 产生这个响应的请求对象
+      // It is the last ClientRequest instance in node.js (in redirects)
+      // and an XMLHttpRequest instance the browser
+      request: {}
+    }
+    
+
+### 取消请求
+
+如果一个HTTP请求时间过长，可以取笑它。取消的使用方法如下。
+
+    let cancelToken = axios.CancelToken
+    let source = cancelToken.source()
+    axios.get('https://httpbin.org/ip', {
+        cancelToken: source.token
+    })
+        .then(function (response) {
+            console.log(response.data)
+        })
+        .catch(function (error) {
+            console.log(error)
+        })
+    source.cancel('取消了HTTP请求')
+    
+
+### 使用application/x-www-form-urlencoded格式
+
+默认情况下，axios会将JavaScript对象序列化为JSON对象，如果需要用`application/x-www-form-urlencoded`形式传送数据，可以使用下面的方法。
+
+如果在浏览器中，可以使用`URLSearchParams`对象。
+
+    var params = new URLSearchParams();
+    params.append('param1', 'value1');
+    params.append('param2', 'value2');
+    axios.post('/foo', params);
+    
+
+如果在Node环境下，可以使用`qs`库。
+
+    var qs = require('qs');
+    axios.post('/foo', qs.stringify({ 'bar': 123 }));
+    
+
+一个简单的小例子
+--------
+
+最后，照例用一个小例子结束。这是一个HTML文件，将它保存，然后在浏览器中打开即可。为了简单起见，这里使用原生的JavaScript操作，用到的第三方库只有axios一个。
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>主页</title>
+    </head>
+    <body>
+    <h1>IP地址查询</h1>
+    
+    <button onclick="onClick()">点击查询IP地址</button>
+    <h2 id="ip"></h2>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        function onClick() {
+            axios.get('https://httpbin.org/ip')
+                .then(function (response) {
+                    let ip = document.getElementById('ip')
+                    ip.textContent = response.data.origin
+                })
+                .catch(function (error) {
+                    alert(error)
+                })
+        }
+    </script>
+    </body>
+    </html>

@@ -1,0 +1,290 @@
+<div class="show-content-free"><span>
+            </span><p>这篇参考手册是对cheerio <a href="https://link.jianshu.com/?t=https://cheerio.js.org/" target="_blank" rel="nofollow">官方文档</a> 的中文翻译</p><span>
+</span><blockquote>
+<p>cheerio是jquery核心功能的一个快速灵活而又简洁的实现，主要是为了用在服务器端需要对DOM进行操作的地方</p>
+</blockquote><span>
+</span><h3>简介</h3><span>
+</span><pre><code class="javascript"></code></pre><span>
+</span><p>让你在服务器端和html愉快的玩耍</p><span>
+</span><pre><code class="javascript">var cheerio = require('cheerio'),
+    $ = cheerio.load('&lt;h2 class = "title"&gt;Hello world&lt;/h2&gt;');
+
+$('h2.title').text('Hello there!');
+$('h2').addClass('welcome');
+
+$.html();
+//=&gt; &lt;h2 class = "title welcome"&gt;Hello there!&lt;/h2&gt;
+</code></pre><span>
+</span><h3>安装</h3><span>
+</span><pre><code>npm install cheerio
+</code></pre><span>
+</span><h3>特点</h3><span>
+</span><ul>
+<li><p><strong><em>熟悉的语法</em></strong>：cheerio实现了jQuery的一个子集，去掉了jQuery中所有与DOM不一致或者是用来填浏览器的坑的东西，重现了jQuery最美妙的API</p></li>
+<li><p><strong><em>快到没朋友</em></strong>：cheerio使用了及其简洁而又标准的DOM模型， 因此对文档的转换，操作，渲染都极其的高效。基本的端到端测试显示它的速度至少是JSDOM的8倍</p></li>
+<li><p><strong><em>极其灵活</em></strong>：cheerio使用了<a href="https://link.jianshu.com/?t=https://github.com/FB55" target="_blank" rel="nofollow">@FB55</a>编写的非常兼容的<a href="https://link.jianshu.com/?t=https://github.com/fb55/htmlparser2" target="_blank" rel="nofollow">htmlparser2</a>，因此它可以解析几乎所有的HTML和XML</p></li>
+</ul><span>
+</span><h3>关于JSDOM</h3><span>
+</span><p>cheerio产生的原因是出于对JSDOM的失望，主要体现在以下三点：</p><span>
+</span><ul>
+<li><p><strong><em>JSDOM的解析规则太过于严格</em></strong>：JSDOM的解析器无法处理现在许多的流行网站的内容</p></li>
+<li><p><strong><em>JSDOM太慢了</em></strong>：解析大的网站甚至可以产生可察觉的延迟</p></li>
+<li><p><strong><em>JSDOM太过于重量级</em></strong>：JSDOM的目标是提供与浏览器一样的DOM环境，但是我们往往不需要这样。我们需要的只是一种简单，熟悉的方式来操作我们的HTML</p></li>
+</ul><span>
+</span><h3>什么时候你应该用JSDOM</h3><span>
+</span><p>cheerio并非万能，当你需要一个浏览器一样的环境时，你最好还是用JSDOM，尤其是你需要进行自动化的功能测试时</p><span>
+</span><h3>API</h3><span>
+</span><p>后面的例子中用到的HTML模板如下：</p><span>
+</span><pre><code class="html">&lt;ul id="fruits"&gt;
+  &lt;li class="apple"&gt;Apple&lt;/li&gt;
+  &lt;li class="orange"&gt;Orange&lt;/li&gt;
+  &lt;li class="pear"&gt;Pear&lt;/li&gt;
+&lt;/ul&gt;
+</code></pre><span>
+</span><h4>1. 解析html（load）</h4><span>
+</span><p>首先你需要先加载你的HTML。jQuery会自动完成这一步，因为jQuery操作的DOM是固定的。但是在使用cheerio时我们要手动加载我们的HTML文档</p><span>
+</span><p>首选的方式如下：</p><span>
+</span><pre><code class="javascript">var cheerio = require('cheerio'),
+$ = cheerio.load('&lt;ul id = "fruits"&gt;...&lt;/ul&gt;');
+</code></pre><span>
+</span><p>其次，直接把HTML字符串作为上下文也是可以的：</p><span>
+</span><pre><code class="javascript">$ = require('cheerio');
+$('ul', '&lt;ul id = "fruits"&gt;...&lt;/ul&gt;');
+</code></pre><span>
+</span><p>或者把HTML字符串作为root</p><span>
+</span><pre><code class="javascript">$ = require('cheerio');
+$('li', 'ul', '&lt;ul id = "fruits"&gt;...&lt;/ul&gt;');
+</code></pre><span>
+</span><p>如果你需要自定义一些解析选项，你可以多传递一个对象给load方法：</p><span>
+</span><pre><code class="javascript">$ = cheerio.load('&lt;ul id = "fruits"&gt;...&lt;/ul&gt;', {
+    ignoreWhitespace: true,
+    xmlMode: true
+});
+</code></pre><span>
+</span><p>更多的解析选项可以参考<a href="https://link.jianshu.com/?t=https://github.com/fb55/domhandler" target="_blank" rel="nofollow">domhandler</a>和<a href="https://link.jianshu.com/?t=https://github.com/fb55/htmlparser2/wiki/Parser-options" target="_blank" rel="nofollow">parser-options</a></p><span>
+</span><h4>2. 选择器（selectors）</h4><span>
+</span><p>cheerio的选择器几乎和jQuery一模一样，所以语法上十分相像</p><span>
+</span><pre><code class="javascript">$( selector, [context], [root] )
+</code></pre><span>
+</span><p><strong>selector</strong>在<strong>context</strong>的范围内搜索，<strong>context</strong>的范围又包含在<strong>root</strong>的范围内。<strong>selector</strong>和<strong>context</strong>可以是一个字符串，DOM元素，DOM数组或者cheerio实例。<strong>root</strong>一般是一个HTML文档字符串</p><span>
+</span><p>选择器是文档遍历和操作的起点。如同在jQuery中一样，它是选择元素节点最重要的方法，但是在jQuery中选择器建立在CSS选择器标准库上。cheerio的选择器实现了大部分的方法</p><span>
+</span><pre><code class="javascript">$('.apple', '#fruits').text()
+//=&gt; Apple
+
+$('ul .pear').attr('class')
+//=&gt; pear
+
+$('li[class=orange]').html()
+//=&gt; &lt;li class = "orange"&gt;Orange&lt;/li&gt;
+</code></pre><span>
+</span><h4>3. 属性操作（atrributes）</h4><span>
+</span><p>用来获取和更改属性的方法：</p><span>
+</span><p><strong>.attr(name, value)</strong></p><span>
+</span><p>这个方法用来获取和设置属性。获取第一个符合匹配的元素的属性值。如果某个属性值被设置成null，那么该属性会被移除。你也可以把<strong>map</strong>和<strong>function</strong>作为参数传递进去，就像在jQuery中一样</p><span>
+</span><pre><code class="javascript">$('ul').attr('id')
+//=&gt; fruits
+
+$('.apple').attr('id', 'favorite').html()
+//=&gt; &lt;li class = "apple" id = "favorite"&gt;Apple&lt;/li&gt;
+</code></pre><span>
+</span><blockquote>
+<p>更多信息请查看 <a href="https://link.jianshu.com/?t=http://api.jquery.com/attr/" target="_blank" rel="nofollow">http://api.jquery.com/attr/</a></p>
+</blockquote><span>
+</span><p><strong>.removeAtrr(name)</strong></p><span>
+</span><p>移除名为name的属性</p><span>
+</span><pre><code class="javascript">$('.pear').removeAttr('class').html()
+//=&gt; &lt;li&gt;Pear&lt;/li&gt;
+</code></pre><span>
+</span><p><strong>.hasClass(className)</strong></p><span>
+</span><p>检查元素是否含有此类名</p><span>
+</span><pre><code class="javascript">$('.pear').hasClass('pear')
+//=&gt; true
+
+$('apple').hasClass('fruit')
+//=&gt; false
+
+$('li').hasClass('pear')
+//=&gt; true
+</code></pre><span>
+</span><p><strong>.addClass(className)</strong></p><span>
+</span><p>添加类名到所有的匹配元素，可以用函数作为参数</p><span>
+</span><pre><code class="javascript">$('.pear').addClass('fruit').html()
+//=&gt; &lt;li class = "pear fruit"&gt;Pear&lt;/li&gt;
+
+$('.apple').addClass('fruit red').html()
+//=&gt; &lt;li class = "apple fruit red"&gt;Apple&lt;/li&gt;
+</code></pre><span>
+</span><blockquote>
+<p>参见 <a href="https://link.jianshu.com/?t=http://api.jquery.com/addClass/" target="_blank" rel="nofollow">http://api.jquery.com/addClass/</a></p>
+</blockquote><span>
+</span><p><strong>.remoteClass([className])</strong></p><span>
+</span><p>移除一个或者多个（空格分隔）的类名，如果className为空，则所有的类名都会被移除，可以传递函数作为参数</p><span>
+</span><pre><code class="javascript">$('.pear').removeClass('pear').html()
+//=&gt; &lt;li class = ""&gt;Pear&lt;/li&gt;
+
+$('.apple').addClass('red').removeClass().html()
+//=&gt; &lt;li class = ""&gt;Apple&lt;/li&gt;
+</code></pre><span>
+</span><blockquote>
+<p>参见 <a href="https://link.jianshu.com/?t=http://api.jquery.com/removeClass/" target="_blank" rel="nofollow">http://api.jquery.com/removeClass/</a></p>
+</blockquote><span>
+</span><h4>遍历</h4><span>
+</span><p><strong>.find(selector)</strong></p><span>
+</span><p>在当前元素集合中选择符合选择器规则的元素集合</p><span>
+</span><pre><code class="javascript">$('#fruits').find('li').length
+//=&gt; 3
+</code></pre><span>
+</span><p><strong>.parent()</strong></p><span>
+</span><p>获取元素集合第一个元素的父元素</p><span>
+</span><pre><code class="javascript">$('.pear').parent().attr('id')
+//=&gt; fruits
+</code></pre><span>
+</span><p><strong>.next()</strong></p><span>
+</span><p>选择当前元素的下一个兄弟元素</p><span>
+</span><pre><code class="javascript">$('.apple').next().hasClass('orange')
+//=&gt; true
+</code></pre><span>
+</span><p><strong>.prev()</strong></p><span>
+</span><p>同<strong>.next()</strong>相反</p><span>
+</span><p><strong>.siblings()</strong></p><span>
+</span><p>获取元素集合中第一个元素的所有兄弟元素，不包含它自己</p><span>
+</span><pre><code class="javascript">$('.pear').siblings().length
+//=&gt; 2
+</code></pre><span>
+</span><p><strong>.children( selector )</strong></p><span>
+</span><p><strong>.each( function(index, element) )</strong></p><span>
+</span><p>遍历函数返回false即可终止遍历</p><span>
+</span><pre><code class="javascript">var fruits = [];
+
+$('li').each(function(i, elem) {
+  fruits[i] = $(this).text();
+});
+
+fruits.join(', ');
+//=&gt; Apple, Orange, Pear
+</code></pre><span>
+</span><p><strong>.map( function(index, element) )</strong></p><span>
+</span><pre><code class="javascript">$('li').map(function(i, el) {
+  // this === el
+  return $(this).attr('class');
+}).get().join(', ');
+//=&gt; apple, orange, pear
+</code></pre><span>
+</span><p><strong>.filter( selector )</strong></p><span>
+</span><pre><code class="javascript">$('li').filter('.orange').attr('class');
+//=&gt; orange
+</code></pre><span>
+</span><p><strong>.filter( function(index) )</strong></p><span>
+</span><pre><code class="javascript">$('li').filter(function(i, el) {
+  // this === el
+  return $(this).attr('class') === 'orange';
+}).attr('class')
+//=&gt; orange
+</code></pre><span>
+</span><p><strong>.first()</strong></p><span>
+</span><pre><code class="javascript">$('#fruits').children().first().text()
+//=&gt; Apple
+</code></pre><span>
+</span><p><strong>.last()</strong></p><span>
+</span><pre><code class="javascript">$('#fruits').children().last().text()
+//=&gt; Pear
+</code></pre><span>
+</span><p><strong>.eq( i )</strong></p><span>
+</span><p>缩小元素集合，可以用负数表示倒数第 i 个元素被保留</p><span>
+</span><pre><code class="javascript">$('li').eq(0).text()
+//=&gt; Apple
+
+$('li').eq(-1).text()
+//=&gt; Pear
+</code></pre><span>
+</span><h4>操作DOM</h4><span>
+</span><p>操作DOM结构的方法</p><span>
+</span><p><strong>.append( content, [content, ...] )</strong></p><span>
+</span><p><strong>.prepend( content, [content, ...] )</strong></p><span>
+</span><p><strong>.after( content, [content, ...] )</strong></p><span>
+</span><pre><code class="javascript">$('.apple').after('&lt;li class = "plum"&gt;Plum&lt;/li&gt;')
+$.html()
+//=&gt;  &lt;ul id = "fruits"&gt;
+//      &lt;li class = "apple"&gt;Apple&lt;/li&gt;
+//      &lt;li class = "plum"&gt;Plum&lt;/li&gt;
+//      &lt;li class = "orange"&gt;Orange&lt;/li&gt;
+//      &lt;li class = "pear"&gt;Pear&lt;/li&gt;
+//    &lt;/ul&gt;
+</code></pre><span>
+</span><p><strong>.before( content, [content, ...] )</strong></p><span>
+</span><pre><code class="javascript">$('.apple').before('&lt;li class = "plum"&gt;Plum&lt;/li&gt;')
+$.html()
+//=&gt;  &lt;ul id = "fruits"&gt;
+//      &lt;li class = "plum"&gt;Plum&lt;/li&gt;
+//      &lt;li class = "apple"&gt;Apple&lt;/li&gt;
+//      &lt;li class = "orange"&gt;Orange&lt;/li&gt;
+//      &lt;li class = "pear"&gt;Pear&lt;/li&gt;
+//    &lt;/ul&gt;
+</code></pre><span>
+</span><p><strong>.remove( [selector] )</strong></p><span>
+</span><pre><code class="javascript">$('.pear').remove()
+$.html()
+//=&gt;  &lt;ul id = "fruits"&gt;
+//      &lt;li class = "apple"&gt;Apple&lt;/li&gt;
+//      &lt;li class = "orange"&gt;Orange&lt;/li&gt;
+//    &lt;/ul&gt;
+</code></pre><span>
+</span><p><strong>.replaceWith( content )</strong></p><span>
+</span><pre><code class="javascript">var plum = $('&lt;li class = "plum"&gt;Plum&lt;/li&gt;')
+$('.pear').replaceWith(plum)
+$.html()
+//=&gt; &lt;ul id = "fruits"&gt;
+//     &lt;li class = "apple"&gt;Apple&lt;/li&gt;
+//     &lt;li class = "orange"&gt;Orange&lt;/li&gt;
+//     &lt;li class = "plum"&gt;Plum&lt;/li&gt;
+//   &lt;/ul&gt;
+</code></pre><span>
+</span><p><strong>.empty()</strong></p><span>
+</span><pre><code class="javascript">$('ul').empty()
+$.html()
+//=&gt;  &lt;ul id = "fruits"&gt;&lt;/ul&gt;
+</code></pre><span>
+</span><p><strong>.html( [htmlString] )</strong></p><span>
+</span><pre><code class="javascript">$('.orange').html()
+//=&gt; Orange
+
+$('#fruits').html('&lt;li class = "mango"&gt;Mango&lt;/li&gt;').html()
+//=&gt; &lt;li class="mango"&gt;Mango&lt;/li&gt;
+</code></pre><span>
+</span><p><strong>.text( [textString] )</strong></p><span>
+</span><pre><code class="javascript">$('.orange').text()
+//=&gt; Orange
+
+$('ul').text()
+//=&gt;  Apple
+//    Orange
+//    Pear
+</code></pre><span>
+</span><h4>解析和渲染</h4><span>
+</span><pre><code class="javascript">$.html()
+//=&gt;  &lt;ul id = "fruits"&gt;
+//      &lt;li class = "apple"&gt;Apple&lt;/li&gt;
+//      &lt;li class = "orange"&gt;Orange&lt;/li&gt;
+//      &lt;li class = "pear"&gt;Pear&lt;/li&gt;
+//    &lt;/ul&gt;
+</code></pre><span>
+</span><p>输出包含自己在内的HTML（outer HTML）</p><span>
+</span><pre><code class="javascript">$.html('.pear')
+//=&gt; &lt;li class = "pear"&gt;Pear&lt;/li&gt;
+</code></pre><span>
+</span><h4>杂项</h4><span>
+</span><p><strong>.toArray()</strong></p><span>
+</span><pre><code class="javascript">$('li').toArray()
+//=&gt; [ {...}, {...}, {...} ]
+</code></pre><span>
+</span><p><strong>.clone()</strong></p><span>
+</span><pre><code class="javascript">var moreFruit = $('#fruits').clone()
+</code></pre><span>
+</span><h4>常用工具</h4><span>
+</span><p><strong>$.root()</strong></p><span>
+</span><pre><code class="javascript">$.root().append('&lt;ul id="vegetables"&gt;&lt;/ul&gt;').html();
+//=&gt; &lt;ul id="fruits"&gt;...&lt;/ul&gt;&lt;ul id="vegetables"&gt;&lt;/ul&gt;
+</code></pre><span>
+</span><p><strong>$.contains( container, contained )</strong></p><span>
+
+          </span></div>
